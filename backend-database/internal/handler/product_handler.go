@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	product "github.com/thanachotelu/MafiaSU_arttoy.git/internal/product"
+	product "github.com/thanachotelu/MafiaSU_arttoy.git/pkg/database"
 
 	"github.com/gin-gonic/gin"
 )

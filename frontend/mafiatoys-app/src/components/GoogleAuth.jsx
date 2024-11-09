@@ -14,7 +14,7 @@ const GoogleAuth = ({ setUser, handleClose }) => {
       console.log('Decoded token:', decodedToken);
 
       // ส่ง token ไปยัง backend เพื่อตรวจสอบและรับข้อมูลผู้ใช้
-      const backendResponse = await axios.post('http://localhost:8086/api/v1/auth/google/verify', {
+      const backendResponse = await axios.post('http://localhost:8080/api/v1/auth/google/verify', {
         id_token: credentialResponse.credential,
       });
 
@@ -50,7 +50,7 @@ const GoogleAuth = ({ setUser, handleClose }) => {
   useEffect(() => {
     const fetchClientId = async () => {
       try {
-        const response = await axios.get('http://localhost:8086/api/v1/auth/client-id', {
+        const response = await axios.get('http://localhost:8080/api/v1/auth/client-id', {
           headers: {
             'API-Key': 'werj23489', // ใส่ API-Key ใน headers ของการเรียก API
           },
