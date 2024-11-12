@@ -43,7 +43,6 @@ const NewProducts = () => {
                   />
                   <Card.Body>
                     <Card.Title>{product.name}</Card.Title>
-                    <Card.Text>{product.description}</Card.Text>
                     <Card.Text>
                       <strong>Price: ฿{product.price}</strong>
                     </Card.Text>

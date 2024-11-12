@@ -97,7 +97,10 @@ func main() {
 		products := v1.Group("/products")
 		{
 			products.GET("/:id", h.GetProduct)
-			products.GET("", h.GetProducts) // API ALL Product
+			products.GET("", h.GetProducts)
+			products.GET("/images/:id", h.GetProductImages)
+			products.GET("/category/:category_id", h.GetProductsByCategory)
+			products.GET("/seller/:seller_name", h.GetProductsBySeller)
 		}
 	}
 

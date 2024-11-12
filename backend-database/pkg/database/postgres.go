@@ -88,6 +88,7 @@ type ProductItem struct {
 	Categories []Category     `json:"categories"`
 	Inventory  Inventory      `json:"inventory"`
 	Images     []ProductImage `json:"images"`
+	Sellers    []Seller       `json:"sellers"`
 }
 
 type Category struct {
@@ -101,6 +102,12 @@ type Inventory struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+type Seller struct {
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	Contact string `json:"contact"`
+}
+
 type ProductOption struct {
 	ID     string          `json:"id"`
 	Name   string          `json:"name"`
@@ -109,7 +116,6 @@ type ProductOption struct {
 
 type EcommerceDatabase interface {
 	GetProduct(ctx context.Context, id string) (ProductItem, error)
-	GetAllProducts(ctx context.Context) ([]Product, error)
 	AddProduct(ctx context.Context, product NewProduct) (Product, error)
 	UpdateProduct(ctx context.Context, id string, update UpdateProduct) (Product, error)
 	DeleteProduct(ctx context.Context, id string) error
@@ -233,42 +239,6 @@ func (pdb *PostgresDB) GetProduct(ctx context.Context, id string) (ProductItem, 
 	return product, nil
 }
 
-// Get All Product Query
-func (pdb *PostgresDB) GetAllProducts(ctx context.Context) ([]Product, error) {
-	rows, err := pdb.DB.QueryContext(ctx, "SELECT product_id, name, description, brand, model_number, price, status, seller_id, product_type, category_id, created_at, updated_at FROM products")
-	if err != nil {
-		return nil, fmt.Errorf("failed to query books: %v", err)
-	}
-
-	defer rows.Close()
-
-	var products []Product
-	for rows.Next() {
-		var product Product
-		if err := rows.Scan(
-			&product.ID,
-			&product.Name,
-			&product.Description,
-			&product.Brand,
-			&product.ModelNumber,
-			&product.Price,
-			&product.Status,
-			&product.SellerID,
-			&product.ProductType,
-			&product.CategoryID,
-			&product.CreatedAt,
-			&product.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("failed to scan product: %v", err)
-		}
-
-		products = append(products, product)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("error iteating over books: %v", err)
-	}
-	return products, nil
-}
-
 func (pdb *PostgresDB) AddProduct(ctx context.Context, product NewProduct) (Product, error) {
 	var createdProduct Product
 	err := pdb.DB.QueryRowContext(ctx, `
@@ -329,10 +299,12 @@ func (pdb *PostgresDB) DeleteProduct(ctx context.Context, id string) error {
 func (pdb *PostgresDB) GetProducts(ctx context.Context, params ProductQueryParams) (*ProductResponse, error) {
 	query := `
         SELECT p.product_id, p.name, p.description, p.brand, p.model_number, p.price, 
-               p.status, p.seller_id, p.product_type, p.created_at, p.updated_at,
+               p.status, p.product_type, p.created_at, p.updated_at,
+			   s.seller_id, s.name as seller_name,
                c.category_id, c.name as category_name,
                i.quantity, i.updated_at as inventory_updated_at
         FROM products p
+		LEFT JOIN sellers s ON p.seller_id = s.seller_id
         LEFT JOIN categories c ON p.category_id = c.category_id
         LEFT JOIN inventory i ON p.product_id = i.product_id
         WHERE 1=1`
@@ -436,16 +408,19 @@ func (pdb *PostgresDB) GetProducts(ctx context.Context, params ProductQueryParam
 		var product ProductItem
 		var category Category
 		var inventory Inventory
+		var seller Seller
 		if err := rows.Scan(
 			&product.ID, &product.Name, &product.Description, &product.Brand,
 			&product.ModelNumber, &product.Price, &product.Status,
-			&product.SellerID, &product.ProductType, &product.CreatedAt, &product.UpdatedAt,
+			&product.ProductType, &product.CreatedAt, &product.UpdatedAt,
+			&seller.ID, &seller.Name,
 			&category.ID, &category.Name,
 			&inventory.Quantity, &inventory.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("failed to scan product: %v", err)
 		}
 		product.Categories = []Category{category}
 		product.Inventory = inventory
+		product.Sellers = []Seller{seller}
 
 		// การดึงข้อมูลรูปภาพและตัวเลือกของผลิตภัณฑ์
 		product.Images, err = pdb.GetProductImages(ctx, product.ID)

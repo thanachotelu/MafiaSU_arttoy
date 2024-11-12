@@ -67,7 +67,7 @@ const TopMenu = () => {
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/allproduct" style={{ color: '#000000', fontWeight: 'bold', fontSize: '14px' }}>
+              <Link className="nav-link" to="/allproducts" style={{ color: '#000000', fontWeight: 'bold', fontSize: '14px' }}>
                 สินค้าทั้งหมด
               </Link>
             </li>
@@ -96,22 +96,22 @@ const TopMenu = () => {
                     ATONG SHOPP 玩具
                   </Link>
 
-                  <Link className="dropdown-item" to="/store-1" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
+                  <Link className="dropdown-item" to="/store-2" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
                     <img src="/assets/images/logo_images_arttoys.png" alt="Arttoys" width="30" height="30" style={{ marginRight: '10px' }} />
                     ART TOYS
                   </Link>
 
-                  <Link className="dropdown-item" to="/store-1" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
+                  <Link className="dropdown-item" to="/store-3" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
                     <img src="/assets/images/logo_images_gachabox.png" alt="Arttoys" width="30" height="30" style={{ marginRight: '10px' }} />
                     GACHABOX
                   </Link>
 
-                  <Link className="dropdown-item" to="/store-1" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
+                  <Link className="dropdown-item" to="/store-4" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
                     <img src="/assets/images/logo_images_popmart.png" alt="Arttoys" width="30" height="30" style={{ marginRight: '10px' }} />
                     POP MART
                   </Link>
 
-                  <Link className="dropdown-item" to="/store-1" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
+                  <Link className="dropdown-item" to="/store-5" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
                     <img src="/assets/images/logo_images_pieceofjoy.png" alt="Arttoys" width="30" height="30" style={{ marginRight: '10px' }} />
                     PIECE OF JOY
                   </Link>
