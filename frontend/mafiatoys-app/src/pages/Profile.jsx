@@ -11,16 +11,19 @@ const Profile = () => {
       try {
         const accessToken = sessionStorage.getItem('accessToken'); // ดึง access token จาก sessionStorage
 
+        // Debug: Check if we have a token
+        console.log('Current token:', accessToken);
+
         if (!accessToken) {
-          console.error('No access token found.');
+          console.error('No access token found');
           return;
         }
 
-        console.log('Access token:', accessToken); // ตรวจสอบว่าดึง access token มาถูกต้องไหม
-
         const response = await axios.get('http://localhost:8080/api/v1/users/me', {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": `application/json`,
+            "Authorization": `Bearer ${accessToken}`,
+            
           },
           withCredentials: true, // ส่ง cookies ไปด้วย
         });

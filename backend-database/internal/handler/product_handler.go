@@ -32,7 +32,7 @@ func convertTimesToUserTimezone(product *product.ProductItem, loc *time.Location
 }
 
 func (h *ProductHandlers) GetProducts(c *gin.Context) {
-	limitStr := c.DefaultQuery("limit", "20")
+	limitStr := c.DefaultQuery("limit", "50")
 	limit, err := strconv.Atoi(limitStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid limit value"})
@@ -125,6 +125,51 @@ func (h *ProductHandlers) GetProduct(c *gin.Context) {
 	convertTimesToUserTimezone(&product, loc)
 
 	c.JSON(http.StatusOK, product)
+}
+
+func (h *ProductHandlers) GetProductsByCategory(c *gin.Context) {
+	// ดึง category_id จาก URL parameter
+	categoryIDStr := c.Param("category_id")
+	categoryID, err := strconv.Atoi(categoryIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid category ID"})
+		return
+	}
+
+	// กำหนดพารามิเตอร์การ query
+	params := product.ProductQueryParams{
+		CategoryID: categoryID,
+	}
+
+	// เรียกใช้ฟังก์ชัน GetProducts เพื่อนำข้อมูลสินค้าตามหมวดหมู่
+	response, err := h.store.GetProducts(c.Request.Context(), params)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// ส่งข้อมูลสินค้าตามหมวดหมู่กลับไปยัง client
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *ProductHandlers) GetProductsBySeller(c *gin.Context) {
+	// ดึง category_id จาก URL parameter
+	sellerID := c.Param("seller_id")
+
+	// กำหนดพารามิเตอร์การ query
+	params := product.ProductQueryParams{
+		SellerID: sellerID,
+	}
+
+	// เรียกใช้ฟังก์ชัน GetProducts เพื่อนำข้อมูลสินค้าตามหมวดหมู่
+	response, err := h.store.GetProducts(c.Request.Context(), params)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// ส่งข้อมูลสินค้าตามหมวดหมู่กลับไปยัง client
+	c.JSON(http.StatusOK, response)
 }
 
 func (h *ProductHandlers) AddProduct(c *gin.Context) {
@@ -235,7 +280,7 @@ func (h *ProductHandlers) DeleteProductImage(c *gin.Context) {
 
 func (h *ProductHandlers) GetCategories(c *gin.Context) {
 	// ดึงรายการหมวดหมู่จากฐานข้อมูล (ในตัวอย่างนี้ยังไม่มีการเชื่อมต่อฐานข้อมูล)
-	categories := []string{"Electronics", "Books", "Clothing"}
+	categories := []string{"arttoy", "figure", "accessory"}
 	c.JSON(http.StatusOK, categories)
 }
 

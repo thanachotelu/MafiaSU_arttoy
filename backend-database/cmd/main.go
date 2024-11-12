@@ -66,12 +66,12 @@ func main() {
 
 	// CORS configuration
 	configCors := cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000", "http://localhost:4000"},
+		AllowOrigins:     []string{"http://localhost:3000", "http://localhost:4000", "http://localhost:8080"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "API-Key"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
+		// MaxAge:           12 * time.Hour,
 	}
 	r.Use(cors.New(configCors))
 	r.Use(TimeoutMiddleware(5 * time.Second))
@@ -97,7 +97,10 @@ func main() {
 		products := v1.Group("/products")
 		{
 			products.GET("/:id", h.GetProduct)
-			products.GET("", h.GetProducts) // API ALL Product
+			products.GET("", h.GetProducts)
+			products.GET("/images/:id", h.GetProductImages)
+			products.GET("/category/:category_id", h.GetProductsByCategory)
+			products.GET("/seller/:seller_name", h.GetProductsBySeller)
 		}
 	}
 

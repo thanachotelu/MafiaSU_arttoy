@@ -42,7 +42,6 @@ const NewProducts = () => {
                   </div>
                   <Card.Body className="d-flex flex-column">
                     <Card.Title className="h5 mb-2">{product.name}</Card.Title>
-                    <Card.Text className="flex-grow-1">{product.description}</Card.Text>
                     <Card.Text className="mt-auto">
                       <strong>Price: ฿{product.price}</strong>
                     </Card.Text>

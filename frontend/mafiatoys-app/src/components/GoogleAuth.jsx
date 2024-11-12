@@ -66,7 +66,7 @@ const GoogleAuth = ({ setUser, handleClose }) => {
 
   return (
     <div>
-      {clientId ? ( // เช็คว่ามี clientId ก่อน
+      {clientId ? (
         <GoogleOAuthProvider clientId={clientId}>
           <div className="text-center mt-3">
             <GoogleLogin
@@ -77,7 +77,9 @@ const GoogleAuth = ({ setUser, handleClose }) => {
           </div>
         </GoogleOAuthProvider>
       ) : (
-        <div>Loading...</div> // แสดงข้อความ Loading ระหว่างรอ clientId
+        <div className="text-center mt-3">
+          <p>Failed to fetch Google client ID. Please try again later.</p>
+        </div>
       )}
     </div>
   );

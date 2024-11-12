@@ -33,7 +33,7 @@ func AuthMiddleware(cfg *config.Config) gin.HandlerFunc {
 			return
 		}
 
-		c.Set("user_id", claims.Subject)
+		c.Set("google_id", claims.Subject)
 		c.Next()
 	}
 }
