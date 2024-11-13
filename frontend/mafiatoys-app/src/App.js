@@ -8,6 +8,7 @@ import ProductDetail from './pages/ProductsDetail';
 import Stores from './pages/Stores'; // เพิ่มการนำเข้า Store
 import AllProducts from './pages/AllProducts';
 import Profile from './pages/Profile'; // นำเข้า Profile page
+
 import Atongshopp from './pages/Storepages/Atongshopp';
 import Arttoys from './pages/Storepages/Arttoys';
 import Gachabox from './pages/Storepages/Gachabox';
@@ -25,7 +26,7 @@ function App() {
         <Route path="/search" element={<SearchResults />} />
         <Route path="/stores" element={<Stores />} />          
         <Route path="/allproducts" element={<AllProducts />} />
-        <Route path="/productsdetail" element={<ProductDetail />} />
+        <Route path="/products/:productId" element={<ProductDetail />} />
 
         <Route path="/Storepages/Atongshopp" element={<Atongshopp />} />
         <Route path="/Storepages/Arttoys" element={<Arttoys />} />
