@@ -12,7 +12,6 @@ const AllProducts = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [priceRange, setPriceRange] = useState([0, 20000]);
-    const [selectedShops, setSelectedShops] = useState([]);
     const [sortOption, setSortOption] = useState('');
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [selectedSellers, setSelectedSellers] = useState([]);
@@ -26,48 +25,20 @@ const AllProducts = () => {
         setSortOption(e.target.value);
     };
 
-    // ดึงข้อมูลสินค้าจาก API getProductbySeller
-    const fetchProductsBySeller = async (sellerId) => {
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/products/seller/${sellerId}`);
-            const data = await response.json();
-            setProducts(data.items);
-        } catch (error) {
-            console.error('Error fetching products by seller:', error);
-        }
-    };
-
-    // ดึงข้อมูลสินค้าจาก API getProductbyCate
-    const fetchProductsByCategory = async (categoryId) => {
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/products/category/${categoryId}`);
-            const data = await response.json();
-            setProducts(data.items);
-        } catch (error) {
-            console.error('Error fetching products by category:', error);
-        }
-    };
-
     // ดึงข้อมูลรูปภาพของสินค้าจาก API getProductImages
     const fetchProductImages = async (productId) => {
         try {
-            const response = await fetch(`http://localhost:8080/api/v1/products/images/${productId}`);
-            const data = await response.json();
+            const response = await axios.get(`http://localhost:8080/api/v1/products/images/${productId}`);
             
             // ตรวจสอบว่า data.images และ data.images[0] มีค่าหรือไม่
             setProductImages(prevImages => ({
                 ...prevImages,
-                [productId]: data.images && data.images.length > 0 ? data.images[0]?.image_url : ''
+                [productId]: response.data.images && response.data.images.length > 0 ? response.data.images[0]?.image_url : ''
             }));
         } catch (error) {
             console.error('Error fetching product images:', error);
         }
     };
-
-    useEffect(() => {
-        // ตัวอย่าง: เรียกข้อมูลสินค้าโดยใช้ category_id = 1
-        fetchProductsByCategory(1);
-    }, []);
 
     useEffect(() => {
         // เมื่อได้ข้อมูลสินค้าแล้ว เราจะดึงข้อมูลภาพสำหรับแต่ละสินค้า
@@ -148,7 +119,6 @@ const AllProducts = () => {
         }
         return 0;
     });
-
     if (loading) return <div>Loading...</div>;
     if (error) return <div>{error}</div>;
 
@@ -452,10 +422,10 @@ const AllProducts = () => {
                             <option value="name-desc">Name: Z-A</option>
                         </select>
                     </div>
-                    <h1 className="title">All Products[{filteredProducts.length}]</h1>
-                    {filteredProducts.length === 0 && <p>No products found</p>}
+                    <h1 className="title">All Products[{sortedProducts.length}]</h1>
+                    {sortedProducts.length === 0 && <p>No products found</p>}
                     <div className="product-grid">
-                        {filteredProducts.map(product => {
+                        {sortedProducts.map(product => {
                             // ตรวจสอบว่า images มีค่าหรือไม่ และเป็น Array หรือไม่
                             const primaryImage = Array.isArray(product.images) && product.images.length > 0 
                                 ? product.images.find(img => img.is_primary && product.category_id === product.categories[0]?.id) 
