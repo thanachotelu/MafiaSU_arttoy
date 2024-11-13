@@ -12,6 +12,7 @@ const SearchResults = () => {
   const [searchParams] = useSearchParams();
   const [error, setError] = useState(null); // ใช้สำหรับเก็บข้อผิดพลาด
   const [sortOption, setSortOption] = useState('');
+  const [sortedProducts, setSortedProducts] = useState([]);
 
   const searchQuery = searchParams.get('q');
 
@@ -23,6 +24,7 @@ const SearchResults = () => {
         .then((response) => {
           if (response.data.items) {
             setProducts(response.data.items); // ตั้งค่า products ด้วยข้อมูลจาก API
+            setSortedProducts(sortProducts(response.data.items, sortOption)); // จัดเรียงสินค้าเมื่อได้รับข้อมูล
             setError(null); // ล้าง error หากมีข้อมูล
           } else if (response.data.error) {
             setError(response.data.error); // เก็บข้อความข้อผิดพลาด
@@ -42,41 +44,44 @@ const SearchResults = () => {
     setSortOption(e.target.value);
   };
 
-
   useEffect(() => {
     fetchProducts(searchQuery);
   }, [searchQuery]);
 
-   // ทำการจัดเรียงรายการสินค้าตามตัวเลือก sortOption
-   products.sort((a, b) => {
-    if (sortOption === 'name-asc') {
-      return a.name.localeCompare(b.name); // A-Z
+  useEffect(() => {
+    setSortedProducts(sortProducts(products, sortOption));
+  }, [sortOption, products]);
+
+  const sortProducts = (products, option) => {
+    let sorted = [...products];
+    if (option === 'price-asc') {
+      sorted.sort((a, b) => a.price - b.price); // เรียงจากราคาต่ำไปสูง
+    } else if (option === 'price-desc') {
+      sorted.sort((a, b) => b.price - a.price); // เรียงจากราคาสูงไปต่ำ
     }
-    if (sortOption === 'name-desc') {
-      return b.name.localeCompare(a.name); // Z-A
-    }
-    return 0; // ไม่เรียงถ้าไม่มีการเลือก sort
-  });
+    return sorted;
+  };
 
   return (
     <div>
       <TopMenu />
 
       <Container className="my-5">
+      <div className="sort-container-right">
         <h2 className="text-center mb-4">ผลการค้นหาสำหรับ "{searchQuery}"</h2>
-        <div className="sort-container-right" style={{ margin: '20px' , alignItems: 'right'}}>
-          <label>Sort by : </label>
-          <select onChange={handleSortChange} value={sortOption}>
-            <option value="">None</option>
-            <option value="name-asc">Name: A-Z</option>
-            <option value="name-desc">Name: Z-A</option>
-          </select>
-        </div>
+            <label>Sort by : </label>
+            <select onChange={handleSortChange} value={sortOption} style={{marginBottom: '30px'}}>
+                <option value="">None</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+            </select>
+        </div>   
+
         <Row>
           {error ? (
             <p className="text-center">{error}</p> // แสดงข้อความข้อผิดพลาด
           ) : products.length > 0 ? (
-            products.map((product) => {
+            sortedProducts.map((product) => {
               const primaryImage = product.images.find((img) => img.is_primary)?.image_url || placeholderImage;
 
               return (
