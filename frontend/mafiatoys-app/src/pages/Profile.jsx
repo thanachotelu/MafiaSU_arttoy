@@ -18,12 +18,12 @@ const Profile = () => {
 
         console.log('Access token:', accessToken); // ตรวจสอบว่าดึง access token มาถูกต้องไหม
 
-        const response = await axios.get('http://localhost:8080/api/v1/users/me', {
+        const response = await axios.get('http://localhost:4000/api/v1/users/me', {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
-          withCredentials: true, // ส่ง cookies ไปด้วย
-        });
+          withCredentials: true,
+        });        
 
         console.log('API Response:', response.data); // ตรวจสอบ response จาก API
         setUserProfile(response.data);

@@ -61,14 +61,10 @@ const TopMenu = () => {
         
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav">
-            <li className="nav-item">
-              <Link className="nav-link" to="/new" style={{ color: '#000000', fontWeight: 'bold', fontSize: '14px' }}>
-                ใหม่&แนะนำ
-              </Link>
-            </li>
+
             <li className="nav-item">
               <Link className="nav-link" to="/allproducts" style={{ color: '#000000', fontWeight: 'bold', fontSize: '14px' }}>
-                สินค้าทั้งหมด
+                All Products
               </Link>
             </li>
             
@@ -91,29 +87,41 @@ const TopMenu = () => {
                   display: dropdownOpen ? 'block' : 'none',
                 }}
               >
-                  <Link className="dropdown-item" to="/store-1" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
+                  <Link className="dropdown-item" to="/stores/atongshopp" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
                     <img src="/assets/images/logo_images_Atongshopp.png" alt="Atongshopp" width="30" height="30" style={{ marginRight: '10px' }} />
                     ATONG SHOPP 玩具
                   </Link>
 
-                  <Link className="dropdown-item" to="/store-2" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
+                  <Link className="dropdown-item" to="/stores/arttoys" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
                     <img src="/assets/images/logo_images_arttoys.png" alt="Arttoys" width="30" height="30" style={{ marginRight: '10px' }} />
                     ART TOYS
                   </Link>
 
-                  <Link className="dropdown-item" to="/store-3" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
+                  <Link className="dropdown-item" to="/stores/gachabox" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
                     <img src="/assets/images/logo_images_gachabox.png" alt="Arttoys" width="30" height="30" style={{ marginRight: '10px' }} />
                     GACHABOX
                   </Link>
 
-                  <Link className="dropdown-item" to="/store-4" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
+                  <Link className="dropdown-item" to="/stores/popmart" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
                     <img src="/assets/images/logo_images_popmart.png" alt="Arttoys" width="30" height="30" style={{ marginRight: '10px' }} />
                     POP MART
                   </Link>
 
-                  <Link className="dropdown-item" to="/store-5" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
+                  <Link className="dropdown-item" to="/stores/pieceofjoy" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
                     <img src="/assets/images/logo_images_pieceofjoy.png" alt="Arttoys" width="30" height="30" style={{ marginRight: '10px' }} />
                     PIECE OF JOY
+                  </Link>
+
+                  <Link
+                    className="dropdown-item" to="/stores" style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '8px 20px',
+                      color: '#808080',  // สีเทา
+                      fontWeight: 'bold',
+                      fontSize: '12px'     // ขนาดฟอนต์เล็กลง
+                    }}>
+                    All SHOP
                   </Link>
                 </div>
                 
@@ -160,7 +168,7 @@ const TopMenu = () => {
             </Dropdown>
           ) : (
             <Button variant="light" className="ms-2" onClick={handleShow}>
-              <FaUser /> เข้าสู่ระบบ
+              <FaUser /> Login
             </Button>
           )}
 

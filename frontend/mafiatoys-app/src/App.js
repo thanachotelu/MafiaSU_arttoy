@@ -7,8 +7,13 @@ import ProductDetail from './pages/ProductsDetail';
 
 import Stores from './pages/Stores'; // เพิ่มการนำเข้า Store
 import AllProducts from './pages/AllProducts';
-// import Profile from './pages/Profile'; // นำเข้า Profile page
+import Profile from './pages/Profile'; // นำเข้า Profile page
 
+import Popmart from './pages/Popmart';
+import Gachabox from './pages/Gachabox';
+import Atongshopp from './pages/Atongshopp';
+import Arttoys from './pages/Arttoys';
+import Pieceofjoy from './pages/Pieceofjoy';
 
 function App() {
   return (
@@ -16,10 +21,17 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/search" element={<SearchResults />} />
         <Route path="/stores" element={<Stores />} />          
         <Route path="/allproducts" element={<AllProducts />} />
-        <Route path="/productsdetail" element={<ProductDetail />} />
+        <Route path="/products/:productId" element={<ProductDetail />} />
+
+        <Route path="/stores/popmart" element={<Popmart />} />         
+        <Route path="/stores/gachabox" element={<Gachabox />} />       
+        <Route path="/stores/atongshopp" element={<Atongshopp />} />   
+        <Route path="/stores/arttoys" element={<Arttoys />} />         
+        <Route path="/stores/pieceofjoy" element={<Pieceofjoy />} />
       </Routes>
     </Router>
     </GoogleOAuthProvider>

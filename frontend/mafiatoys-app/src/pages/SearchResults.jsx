@@ -11,6 +11,7 @@ const SearchResults = () => {
   const [products, setProducts] = useState([]);
   const [searchParams] = useSearchParams();
   const [error, setError] = useState(null); // ใช้สำหรับเก็บข้อผิดพลาด
+  const [sortOption, setSortOption] = useState('');
 
   const searchQuery = searchParams.get('q');
 
@@ -37,9 +38,25 @@ const SearchResults = () => {
     }
   };
 
+  const handleSortChange = (e) => {
+    setSortOption(e.target.value);
+  };
+
+
   useEffect(() => {
     fetchProducts(searchQuery);
   }, [searchQuery]);
+
+   // ทำการจัดเรียงรายการสินค้าตามตัวเลือก sortOption
+   products.sort((a, b) => {
+    if (sortOption === 'name-asc') {
+      return a.name.localeCompare(b.name); // A-Z
+    }
+    if (sortOption === 'name-desc') {
+      return b.name.localeCompare(a.name); // Z-A
+    }
+    return 0; // ไม่เรียงถ้าไม่มีการเลือก sort
+  });
 
   return (
     <div>
@@ -47,6 +64,14 @@ const SearchResults = () => {
 
       <Container className="my-5">
         <h2 className="text-center mb-4">ผลการค้นหาสำหรับ "{searchQuery}"</h2>
+        <div className="sort-container-right" style={{ margin: '20px' , alignItems: 'right'}}>
+          <label>Sort by : </label>
+          <select onChange={handleSortChange} value={sortOption}>
+            <option value="">None</option>
+            <option value="name-asc">Name: A-Z</option>
+            <option value="name-desc">Name: Z-A</option>
+          </select>
+        </div>
         <Row>
           {error ? (
             <p className="text-center">{error}</p> // แสดงข้อความข้อผิดพลาด
@@ -70,29 +95,23 @@ const SearchResults = () => {
                       </Col>
                       <Col md={6}>
                         <Card.Body>
-                          <Card.Title style={{ fontSize: '1.5rem', color: '#007bff' }}>
-                            {product.name}
-                          </Card.Title>
-                          <div style={{ fontSize: '1.2rem', color: '#ff6600' }}>
-                            <strong>{product.price ? `฿${product.price}` : 'ราคาไม่ระบุ'}</strong>
-                          </div>
-                          <Card.Text>
-                            {product.description ? product.description : 'ไม่มีคำอธิบายสินค้า'}
-                          </Card.Text>
                           <div className="d-flex align-items-center">
                             <span className="badge bg-success me-2">New</span>
-                            {product.price && (
-                              <span className="badge bg-danger me-2">Hot</span>
-                            )}
+                          </div>
+                          <Card.Title style={{ fontSize: '1.5rem', color: '#000000', fontWeight: 'bold' }}>
+                            {product.name}
+                          </Card.Title>
+                          <div style={{ fontSize: '1.2rem', color: 'red' }}>
+                            <strong>{product.price ? `฿${product.price.toLocaleString()}.00` : 'ราคาไม่ระบุ'}</strong>
                           </div>
                         </Card.Body>
                       </Col>
                       <Col md={3} className="d-flex align-items-center justify-content-center">
                         <div>
-                          <Button variant="primary" className="me-2">
+                          <Button variant="danger" className="me-2">
                             เพิ่มลงในตะกร้า
                           </Button>
-                          <Link to={`/product/${product.id}`}>
+                          <Link to={`/products/${product.product_id}`}>
                             <Button variant="outline-secondary">
                               ดูรายละเอียด
                             </Button>

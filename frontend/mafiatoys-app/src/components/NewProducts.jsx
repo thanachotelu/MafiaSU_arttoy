@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, Container, Row, Col } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 
 const NewProducts = () => {
   const [products, setProducts] = useState([]);
-
-  // ใช้ URL ของรูปภาพ placeholder แทนการ import
   const placeholderImage = '../assets/images/placeholder.jpg';
 
   useEffect(() => {
@@ -21,33 +20,33 @@ const NewProducts = () => {
 
   return (
     <Container className="my-5">
-      <h2 className="text-center mb-4" style={{fontWeight: 'bold', color: 'red'}}>สินค้ามาใหม่</h2>
+      <h2 className="text-center mb-4" style={{ fontWeight: 'bold', color: 'red' }}>สินค้ามาใหม่</h2>
       <Row>
         {products.length > 0 ? (
           products.map((product) => {
-            // ใช้รูปภาพหลัก ถ้าไม่มีให้ใช้ placeholderImage
             const primaryImage = product.images.find((img) => img.is_primary)?.image_url;
 
             return (
-              <Col md={4} key={product.id}>
-                <Card className="mb-4">
-                  {/* ใช้ onError เพื่อตรวจสอบว่ารูปภาพโหลดไม่สำเร็จหรือไม่ */}
-                  <Card.Img 
-                    variant="top" 
-                    src={primaryImage || placeholderImage} 
-                    alt={product.name} 
-                    onError={(e) => {
-                      e.target.onerror = null; // ป้องกันการเรียก onError ซ้ำ
-                      e.target.src = placeholderImage; // เปลี่ยนไปใช้รูปภาพสำรอง
-                    }} 
-                  />
-                  <Card.Body>
-                    <Card.Title>{product.name}</Card.Title>
-                    <Card.Text>
-                      <strong>Price: ฿{product.price}</strong>
-                    </Card.Text>
-                  </Card.Body>
-                </Card>
+              <Col md={4} key={product.product_id}>
+                <Link to={`/products/${product.product_id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <Card className="mb-4" style={{ cursor: 'pointer' , height: '100%'}}>
+                    <Card.Img
+                      variant="top"
+                      src={primaryImage || placeholderImage}
+                      alt={product.name}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = placeholderImage;
+                      }}
+                    />
+                    <Card.Body>
+                      <Card.Title>{product.name}</Card.Title>
+                      <Card.Text style={{color: 'red', fontWeight: 'none'}}>
+                        <strong>฿{product.price.toLocaleString()}.00</strong>
+                      </Card.Text>
+                    </Card.Body>
+                  </Card>
+                </Link>
               </Col>
             );
           })
