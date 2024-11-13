@@ -29,7 +29,6 @@ const GoogleAuth = ({ setUser, handleClose }) => {
         };
         setUser(userData);
         sessionStorage.setItem('user', JSON.stringify(userData)); // เก็บข้อมูลผู้ใช้ใน sessionStorage
-
         sessionStorage.setItem('accessToken', backendResponse.data.access_token); // เก็บ accessToken
 
         // ปิด modal หลังจากล็อกอินสำเร็จ
