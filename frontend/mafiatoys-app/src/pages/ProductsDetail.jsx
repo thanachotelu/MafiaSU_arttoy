@@ -88,6 +88,8 @@ const ProductDetail = () => {
         );
     }
 
+    const totalPrice = quantity * product.price;
+
     return (
         <div>
             <TopMenu />
@@ -343,7 +345,7 @@ const ProductDetail = () => {
                     </h1>
 
                     <p style={{ color: 'red', fontSize: '1.5em', marginBottom: '10px' }}>
-                        ฿{product.price.toLocaleString()}.00
+                        ฿{totalPrice.toLocaleString()}.00
                     </p>
 
                     <ButtonGroup className="me-2" aria-label="First group">
