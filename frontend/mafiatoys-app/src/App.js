@@ -7,7 +7,7 @@ import ProductDetail from './pages/ProductsDetail';
 
 import Stores from './pages/Stores'; // เพิ่มการนำเข้า Store
 import AllProducts from './pages/AllProducts';
-// import Profile from './pages/Profile'; // นำเข้า Profile page
+import Profile from './pages/Profile'; // นำเข้า Profile page
 
 
 function App() {
@@ -20,6 +20,7 @@ function App() {
         <Route path="/stores" element={<Stores />} />          
         <Route path="/allproducts" element={<AllProducts />} />
         <Route path="/productsdetail" element={<ProductDetail />} />
+        <Route path="/profile" element={<Profile/>} />
       </Routes>
     </Router>
     </GoogleOAuthProvider>
