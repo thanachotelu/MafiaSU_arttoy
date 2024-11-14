@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
 import TopMenu from '../components/TopMenu';
 import Footer from '../components/Footer';
+import { useNavigate } from 'react-router-dom';
 
 import { FaTimes } from 'react-icons/fa';
 import Button from 'react-bootstrap/Button';
@@ -12,7 +13,7 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import "../index.css";
 
 
-const ProductDetail = () => {
+const ProductDetail = ( { addToCart }) => {
     const { productId } = useParams();
     const [product, setProduct] = useState(null);
     const [mainImage, setMainImage] = useState('');
@@ -36,6 +37,7 @@ const ProductDetail = () => {
         setIsCartPanelOpen(!isCartPanelOpen);
     };
 
+    const navigate = useNavigate();
     useEffect(() => {
         const fetchProductDetails = async () => {
             try {
@@ -90,6 +92,18 @@ const ProductDetail = () => {
     }
 
     const totalPrice = quantity * product.price;
+    
+    const handleAddToCart = () => {
+        addToCart({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            quantity, // ส่งค่าจำนวนที่ผู้ใช้เลือก
+            imageUrl: mainImage
+        });
+        // นำทางไปยังหน้า CartDetail หรือแค่แจ้งเตือนว่าถูกเพิ่มสำเร็จ
+        navigate('/CartDetail'); // หรือใช้ navigate('/allproducts') เพื่อกลับไปยัง AllProduct
+    };
 
     return (
         <div>
@@ -373,6 +387,7 @@ const ProductDetail = () => {
                             cursor: 'pointer',
                             fontSize: '1em',
                         }}
+                        onClick={handleAddToCart}
                     >
                         ไปที่ตะกร้า
                     </button>
