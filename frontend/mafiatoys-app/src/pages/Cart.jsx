@@ -39,7 +39,7 @@ const Cart = () => {
 
     return (
         <div>
-            <TopMenu />
+            <TopMenu cartItemCount={cartItems.length}/>
             <div style={styles.cartContainer}>
                 <div style={styles.contentContainer}>
                     <div style={styles.cartContent}>
@@ -47,7 +47,7 @@ const Cart = () => {
                         {cartItems.map((item) => (
                             <div key={item.product_id} style={styles.cartItem}>
                                 <img
-                                    src={item.image_url || 'https://via.placeholder.com/150'}
+                                    src={item.images ? item.images[0]?.image_url : 'https://via.placeholder.com/150'}
                                     alt={item.name}
                                     style={styles.itemImage}
                                     onError={(e) => { e.target.src = 'https://via.placeholder.com/150'; }}

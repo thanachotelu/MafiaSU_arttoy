@@ -11,6 +11,8 @@ const TopMenu = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const { cartItems } = useCart();
+  const cartItemCount = cartItems.length;
 
   useEffect(() => {
     // ดึงข้อมูลผู้ใช้จาก sessionStorage เมื่อหน้าเว็บถูกโหลดหรือรีเฟรช
@@ -147,7 +149,7 @@ const TopMenu = () => {
 
         <div className="d-flex">
           <Link className="btn btn-light" to="/cart">
-            <FaShoppingBag /> <span className="badge bg-danger"></span>
+            <FaShoppingBag /> <span className="badge bg-danger">{cartItemCount > 0 && cartItemCount.toString() }</span>
           </Link>
 
 

@@ -379,7 +379,7 @@ const ProductDetail = () => {
                 {/* Total Price and Add to Cart Button at the Bottom */}
                 <div style={{ marginTop: '20px', textAlign: 'center' }}>
                     <p style={{ fontSize: '1.2em', fontWeight: 'bold', marginBottom: '10px' }}>
-                        Total: ฿{totalPrice.toLocaleString()}.00
+                        Total: ฿{product.price.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
                     <button class="glow-on-hover1"
                         style={{
