@@ -43,7 +43,7 @@ const RecommendProducts = () => {
                       <Card.Title align="left" style={{color: 'gray'}}>{product.sellers[0]?.name || "Unknown Shop"}</Card.Title>
                       <Card.Subtitle align="left">{product.name}</Card.Subtitle>
                       <Card.Text align="left"style={{color: 'red', fontSize: '1.1em'}}>
-                        ฿{product.price.toLocaleString()}.00
+                        ฿{product.price.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </Card.Text>
                     </Card.Body>
                   </Card>

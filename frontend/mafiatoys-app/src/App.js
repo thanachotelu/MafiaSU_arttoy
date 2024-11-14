@@ -13,6 +13,7 @@ import Arttoys from './pages/Arttoys';
 import Pieceofjoy from './pages/Pieceofjoy';
 import Cart from './pages/Cart';
 import { CartProvider } from './context/CartContext';
+import Checkout from './pages/Checkout';
 
 function App() {
   return (
@@ -23,7 +24,8 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/search" element={<SearchResults />} />
             <Route path="/stores" element={<Stores />} />
-            <Route path="/cart" element={<Cart />} />       
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />          
             <Route path="/allproducts" element={<AllProducts />} />
             <Route path="/products/:productId" element={<ProductDetail />} />
             <Route path="/stores/popmart" element={<Popmart />} />         
