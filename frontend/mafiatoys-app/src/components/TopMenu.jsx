@@ -4,6 +4,11 @@ import { FaSearch, FaShoppingCart, FaUser } from 'react-icons/fa';
 import { Button, Modal, Dropdown } from 'react-bootstrap'; // เพิ่ม Dropdown จาก react-bootstrap
 import GoogleAuth from './GoogleAuth';
 
+import axios from 'axios';
+
+const accessToken = sessionStorage.getItem('accessToken'); 
+console.log('Current token:', accessToken);
+
 const TopMenu = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showLogin, setShowLogin] = useState(false);
@@ -11,10 +16,22 @@ const TopMenu = () => {
   const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
+  const [accessToken, setAccessToken] = useState(null);
+
   useEffect(() => {
     // ดึงข้อมูลผู้ใช้จาก sessionStorage เมื่อหน้าเว็บถูกโหลดหรือรีเฟรช
     const storedUser = sessionStorage.getItem('user');
+    const storedAccessToken = sessionStorage.getItem('accessToken');
     if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+    if (storedAccessToken) {
+      try{
+        setAccessToken(JSON.parse(storedAccessToken));
+      } catch (error) {
+        console.log('Error parsing JSON:', error, storedAccessToken);
+      }
+
       setUser(JSON.parse(storedUser)); // กำหนดข้อมูลผู้ใช้ใน state
     }
   }, []);
@@ -33,11 +50,24 @@ const TopMenu = () => {
   const handleShow = () => setShowLogin(true);
   const handleClose = () => setShowLogin(false);
 
-  const handleLogout = () => {
-    // ลบข้อมูลผู้ใช้จาก sessionStorage
-    sessionStorage.removeItem('user');
-    setUser(null); // รีเซ็ต state
-    navigate('/'); // เปลี่ยนเส้นทางกลับไปที่หน้าหลัก
+  const handleLogout = async () => {
+    try {
+      // Use the access token to make a logout request to the backend
+      await axios.post('/api/v1/auth/logout', null, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+
+      // Remove user and access token from sessionStorage
+      sessionStorage.removeItem('user');
+      sessionStorage.removeItem('accessToken');
+      setUser(null);
+      setAccessToken(null);
+      navigate('Home');
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
   };
 
   return (
@@ -62,7 +92,7 @@ const TopMenu = () => {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <Link className="nav-link" to="#new-products-section" style={{ color: '#000000', fontWeight: 'bold', fontSize: '14px' }}>
+              <Link className="nav-link" to="/new" style={{ color: '#000000', fontWeight: 'bold', fontSize: '14px' }}>
                 ใหม่&แนะนำ
               </Link>
             </li>
@@ -149,7 +179,7 @@ const TopMenu = () => {
         </form>
 
         <div className="d-flex">
-          <Link className="btn btn-light" to="/CartDetail">
+        <Link className="btn btn-light" to="/cart">
             <FaShoppingCart /> <span className="badge bg-danger"></span>
           </Link>
 
@@ -187,9 +217,11 @@ const TopMenu = () => {
         </Modal.Header>
         <Modal.Body>
           <GoogleAuth
-            setUser={(user) => {
+            setUser={(user, accessToken)=> {
               setUser(user);
-              sessionStorage.setItem('user', JSON.stringify(user)); // เก็บข้อมูลผู้ใช้ใน sessionStorage
+              setAccessToken(accessToken);
+              sessionStorage.setItem('user', JSON.stringify(user));
+              sessionStorage.setItem('accessToken', JSON.stringify(accessToken));
             }}
             handleClose={handleClose}
           />

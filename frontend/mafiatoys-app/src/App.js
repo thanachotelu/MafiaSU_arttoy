@@ -45,7 +45,7 @@ function App() {
           <Route path="/search" element={<SearchResults />} />
           <Route path="/stores" element={<Stores />} />
           <Route path="/allproducts" element={<AllProducts />} />
-          <Route path="/products/:productId" element={<ProductDetail />} />
+
           <Route path="/products/:productId" element={<ProductDetail addToCart={addToCart} />} />
           <Route path="/CartDetail" element={<CartDetail cartItems={cartItems} setCartItems={setCartItems} />} />
         <Route path="/Stores" element={<Stores />} />
