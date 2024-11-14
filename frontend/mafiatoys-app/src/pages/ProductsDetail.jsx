@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams , useNavigate} from 'react-router-dom';
 import { Container } from 'react-bootstrap';
 import TopMenu from '../components/TopMenu';
 import Footer from '../components/Footer';
-import { useNavigate } from 'react-router-dom';
-
+import { useCart } from './CartContext';
+import { FaTimes } from 'react-icons/fa';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import InputGroup from 'react-bootstrap/InputGroup';
-import "../index.css";
 
 
-const ProductDetail = ({ addToCart }) => {
+const ProductDetail = () => {
     const { productId } = useParams();
     const [product, setProduct] = useState(null);
     const [mainImage, setMainImage] = useState('');
@@ -21,8 +20,14 @@ const ProductDetail = ({ addToCart }) => {
     const [quantity, setQuantity] = useState(1);
     const [isFiguresOpen, setIsFiguresOpen] = useState(false);
     const [isShippingOpen, setIsShippingOpen] = useState(false);
-
     const [isCartPanelOpen, setIsCartPanelOpen] = useState(false); //Side panel
+    const { addToCart } = useCart();
+    const navigate = useNavigate();
+
+    const handleAddToCart = () => {
+        addToCart(product, quantity);
+        navigate('/CartDetail');
+    };
 
     const handleQuantityChange = (action) => {
         if (action === 'increase') {
@@ -32,11 +37,12 @@ const ProductDetail = ({ addToCart }) => {
         }
     };
 
+    const totalPrice = product ? product.price * quantity : 0;
+
     const toggleCartPanel = () => {
         setIsCartPanelOpen(!isCartPanelOpen);
     };
 
-    const navigate = useNavigate();
     useEffect(() => {
         const fetchProductDetails = async () => {
             try {
@@ -89,22 +95,6 @@ const ProductDetail = ({ addToCart }) => {
             </div>
         );
     }
-
-    const totalPrice = quantity * product.price;
-
-    const handleAddToCart = () => {
-        
-        addToCart({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            quantity, // ส่งค่าจำนวนที่ผู้ใช้เลือก
-            imageUrl: mainImage
-        });
-        // นำทางไปยังหน้า CartDetail หรือแค่แจ้งเตือนว่าถูกเพิ่มสำเร็จ
-        navigate('/CartDetail'); // หรือใช้ navigate('/allproducts') เพื่อกลับไปยัง AllProduct
-        
-    };
 
     return (
         <div>
@@ -180,12 +170,11 @@ const ProductDetail = ({ addToCart }) => {
                     </h1>
 
                     <p style={{ color: 'red', fontSize: '1.5em', marginBottom: '10px' }}>
-                        ฿{product.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-
+                        ฿{product.price.toLocaleString()}.00
                     </p>
 
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                        <span style={{ marginRight: '10px' }}>จำนวน : </span>
+                        <span style={{ marginRight: '10px' }}>QUANTITY : </span>
                         <ButtonGroup className="me-2" aria-label="First group">
                             <Button variant="secondary" onClick={() => handleQuantityChange('decrease')}>-</Button>
                             <InputGroup>
@@ -193,6 +182,7 @@ const ProductDetail = ({ addToCart }) => {
                             </InputGroup>
                             <Button variant="info" onClick={() => handleQuantityChange('increase')}>+</Button>
                         </ButtonGroup>
+
                     </div>
 
                     {/* Add to Cart and Buy Now buttons */}
@@ -310,7 +300,7 @@ const ProductDetail = ({ addToCart }) => {
             <Footer />
 
             {/* Sliding Cart Panel */}
-            <div
+                <div
                 className={`cart-panel ${isCartPanelOpen ? 'open' : ''}`}
                 style={{
                     position: 'fixed',
@@ -322,40 +312,59 @@ const ProductDetail = ({ addToCart }) => {
                     boxShadow: '0 0 20px rgba(0, 0, 0, 0.2)',
                     transition: 'right 0.3s ease-in-out',
                     padding: '20px',
-                    overflowY: 'auto',
                     display: 'flex',
-                    flexDirection: 'column'
+                    flexDirection: 'column',
+                    justifyContent: 'space-between', // This will push content to the bottom
+                    overflowY: 'auto'
                 }}
             >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                    <h3><u>สรุปสินค้า</u></h3>
-                </div>
-
-                {/* Cart Items */}
                 <div>
-                    <img
-                        src={mainImage}
-                        alt={product.name}
-                        style={{
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                        <h3>Your Cart</h3>
+                        <button
+                            style={{
+                                border: 'none',
+                                backgroundColor: 'transparent',
+                                cursor: 'pointer',
+                                fontSize: '24px'
+                            }}
+                            onClick={toggleCartPanel}
+                        >
+                            <FaTimes />
+                        </button>
+                    </div>
 
-                            width: '100px',
-                            height: 'auto',
-                            marginBottom: '20px',
-                            objectFit: 'contain',
-                            transition: 'transform 0.3s ease',
-                        }}
-                    />
+                    {/* Cart Item */}
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+                        {/* Product Image */}
+                        <img
+                            src={mainImage}
+                            alt={product.name}
+                            style={{
+                                width: '80px',
+                                height: '80px',
+                                marginRight: '20px',
+                                objectFit: 'contain',
+                                transition: 'transform 0.3s ease',
+                            }}
+                            onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+                            onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                        />
 
-                    <h1 style={{ fontSize: '1.5em', marginBottom: '20px', fontWeight: 'bold' }}>
-                        {product.name}
-                    </h1>
+                        {/* Product Details */}
+                        <div style={{ flexGrow: 1 }}>
+                            <h1 style={{ fontSize: '1.2em', margin: '0 0 10px', fontWeight: 'bold' }}>
+                                {product.name}
+                            </h1>
 
-                    <p style={{ color: 'red', fontSize: '1.5em', marginBottom: '10px' }}>
-                        ฿{totalPrice.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </p>
+                            <p style={{ color: 'red', fontSize: '1.2em', margin: 0 }}>
+                                ฿{product.price.toLocaleString()}.00
+                            </p>
+                        </div>
+                    </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                    <span style={{ marginRight: '10px' }}>จำนวน : </span>
+                    {/* Quantity Control */}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
                         <ButtonGroup className="me-2" aria-label="First group">
                             <Button variant="secondary" onClick={() => handleQuantityChange('decrease')}>-</Button>
                             <InputGroup>
@@ -363,12 +372,14 @@ const ProductDetail = ({ addToCart }) => {
                             </InputGroup>
                             <Button variant="info" onClick={() => handleQuantityChange('increase')}>+</Button>
                         </ButtonGroup>
-
                     </div>
                 </div>
 
-                <div style={{ marginTop: 'auto' }}>
-
+                {/* Total Price and Add to Cart Button at the Bottom */}
+                <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                    <p style={{ fontSize: '1.2em', fontWeight: 'bold', marginBottom: '10px' }}>
+                        Total: ฿{totalPrice.toLocaleString()}.00
+                    </p>
                     <button class="glow-on-hover1"
                         style={{
                             width: '100%',
@@ -383,7 +394,7 @@ const ProductDetail = ({ addToCart }) => {
                     >
                         ไปที่ตะกร้า
                     </button>
-
+                    
                     <button class="back-btn"
                         style={{
                             padding: '10px 20px',
@@ -395,12 +406,10 @@ const ProductDetail = ({ addToCart }) => {
                     >
                         กลับไปช็อป
                     </button>
-
                 </div>
             </div>
 
-
-        </div >
+        </div>
     );
 };
 

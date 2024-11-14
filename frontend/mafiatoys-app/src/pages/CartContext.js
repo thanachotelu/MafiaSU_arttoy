@@ -1,31 +1,43 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useContext } from 'react';
 
-// สร้าง Context
-export const CartContext = createContext();
+const CartContext = createContext();
 
-// สร้าง Provider สำหรับการใช้ Context
 export const CartProvider = ({ children }) => {
-    const [cart, setCart] = useState([]);
+    const [cartItems, setCartItems] = useState([]);
 
-    // ฟังก์ชันในการเพิ่มสินค้าลงตะกร้า
-    const addToCart = (product) => {
-        setCart((prevCart) => {
-            // ตรวจสอบสินค้าที่ซ้ำกัน
-            const existingProduct = prevCart.find(item => item.id === product.id);
-            if (existingProduct) {
-                return prevCart.map(item =>
-                    item.id === product.id
-                        ? { ...item, quantity: item.quantity + product.quantity }
-                        : item
-                );
+    const addToCart = (product, quantity) => {
+        setCartItems(prevItems => {
+            const itemIndex = prevItems.findIndex(item => item.product_id === product.product_id);
+
+            if (itemIndex !== -1) {
+                // ถ้าสินค้ามีอยู่ในตะกร้าแล้ว ให้เพิ่มจำนวน
+                const updatedItems = [...prevItems];
+                updatedItems[itemIndex].quantity += quantity;
+                return updatedItems;
             }
-            return [...prevCart, product];
+
+            // ถ้าไม่มี ให้เพิ่มสินค้าใหม่ในตะกร้า
+            return [...prevItems, { ...product, quantity }];
         });
     };
 
+    const removeFromCart = (product_id) => {
+        setCartItems(prevItems => prevItems.filter(item => item.product_id !== product_id));
+    };
+
+    const updateItemQuantity = (product_id, quantity) => {
+        setCartItems(prevItems => 
+            prevItems.map(item => 
+                item.product_id === product_id ? { ...item, quantity } : item
+            )
+        );
+    };
+
     return (
-        <CartContext.Provider value={{ cart, addToCart }}>
+        <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateItemQuantity }}>
             {children}
         </CartContext.Provider>
     );
 };
+
+export const useCart = () => useContext(CartContext);
