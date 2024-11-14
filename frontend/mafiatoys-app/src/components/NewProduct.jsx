@@ -3,15 +3,28 @@ import axios from 'axios';
 import { Card, Container, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
-const NewProducts = () => {
+const NewProduct = () => {
   const [products, setProducts] = useState([]);
   const placeholderImage = '../assets/images/placeholder.jpg';
 
   useEffect(() => {
     axios
-      .get('/api/v1/products?sort=created_at&order=desc&limit=3')
+      .get('/api/v1/products?sort=created_at&order=desc&limit=20')
       .then((response) => {
-        setProducts(response.data.items);
+        const allProducts = response.data.items;
+
+        const uniqueProducts = [];
+        const seenSellers = new Set();
+
+        for (const product of allProducts) {
+          if (product.sellers && product.sellers[0] && !seenSellers.has(product.sellers[0].id)) {
+            uniqueProducts.push(product);
+            seenSellers.add(product.sellers[0].id);
+          }
+          if (uniqueProducts.length === 5) break; // หยุดเมื่อครบ 5 ชิ้น
+        }
+
+        setProducts(uniqueProducts);
       })
       .catch((error) => {
         console.error('Error fetching the products:', error);
@@ -40,9 +53,10 @@ const NewProducts = () => {
                       }}
                     />
                     <Card.Body>
-                      <Card.Title>{product.name}</Card.Title>
-                      <Card.Text style={{color: 'red', fontWeight: 'none'}}>
-                        <strong>฿{product.price.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+                      <Card.Title align="left" style={{color: 'gray'}}>{product.sellers[0]?.name || "Unknown Shop"}</Card.Title>
+                      <Card.Subtitle align="left">{product.name}</Card.Subtitle>
+                      <Card.Text align="left"style={{color: 'red', fontSize: '1.1em'}}>
+                        ฿{product.price.toLocaleString()}.00
                       </Card.Text>
                     </Card.Body>
                   </Card>
@@ -58,4 +72,4 @@ const NewProducts = () => {
   );
 };
 
-export default NewProducts;
+export default NewProduct;

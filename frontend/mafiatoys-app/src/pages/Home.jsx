@@ -1,7 +1,8 @@
 import React from 'react';
 import TopMenu from '../components/TopMenu'; // ส่วนแสดงเมนูด้านบน
 import BannerCarousel from '../components/BannerCarousel'; // ส่วนแสดง Banner
-import NewProducts from '../components/NewProducts'; // ส่วนแสดงสินค้ามาใหม่
+import RecommendProducts from '../components/RecommendProducts'; // ส่วนแสดงสินค้าแนะนำ
+import NewProduct from '../components/NewProduct'; // ส่วนแสดงสินค้ามาใหม่
 import Footer from '../components/Footer'; // ส่วนแสดง Footer
 
 const Home = () => {
@@ -9,7 +10,8 @@ const Home = () => {
     <div>
       <TopMenu />
       <BannerCarousel />
-      <NewProducts /> {/* แสดงสินค้ามาใหม่ */}
+      <RecommendProducts /> {/* แสดงสินค้ามาใหม่ */}
+      <NewProduct/>
       <Footer />
     </div>
   );

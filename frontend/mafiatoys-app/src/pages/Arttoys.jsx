@@ -246,7 +246,7 @@ if (error) return <div>{error}</div>;
             </select>
           </div>
 
-          {sortedProducts.length.length === 0 && <p>No products found</p>}
+          <h1 className="title">All Products</h1>
           <div className="product-grid">
             {sortedProducts.map(product => {
                 // ตรวจสอบว่า images มีค่าหรือไม่ และเป็น Array หรือไม่

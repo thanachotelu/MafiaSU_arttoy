@@ -113,11 +113,8 @@ const SearchResults = () => {
                       </Col>
                       <Col md={3} className="d-flex align-items-center justify-content-center">
                         <div>
-                          <Button variant="danger" className="me-2">
-                            เพิ่มลงในตะกร้า
-                          </Button>
                           <Link to={`/products/${product.product_id}`}>
-                            <Button variant="outline-secondary">
+                            <Button variant="danger" className="me-2">
                               ดูรายละเอียด
                             </Button>
                           </Link>

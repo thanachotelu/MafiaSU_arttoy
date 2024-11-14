@@ -209,11 +209,8 @@ if (error) return <div>{error}</div>;
         </div>
 
         <div className="product-section">
-
-          <h1 className="title">All Products[{sortedProducts.length}]</h1>
-          
-          <div className="sort-container-right" style={{marginBottom: '30px'}}>
-            <label>Sort by : </label>
+          <div className="sort-container-right">
+            <label>Sort by: </label>
             <select onChange={handleSortChange} value={sortOption}>
               <option value="">None</option>
               <option value="price-asc">Price: Low to High</option>
@@ -223,6 +220,7 @@ if (error) return <div>{error}</div>;
             </select>
           </div>
 
+          <h1 className="title">All Products[{sortedProducts.length}]</h1>
           {sortedProducts.length.length === 0 && <p>No products found</p>}
           <div className="product-grid">
             {sortedProducts.map(product => {
