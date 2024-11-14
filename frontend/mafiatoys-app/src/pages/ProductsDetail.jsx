@@ -9,6 +9,7 @@ import { FaTimes } from 'react-icons/fa';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import InputGroup from 'react-bootstrap/InputGroup';
+import "../index.css";
 
 
 const ProductDetail = () => {
@@ -168,15 +169,14 @@ const ProductDetail = () => {
                     </p>
 
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                        <span style={{ marginRight: '10px' }}>QUANTITY : </span>
+                        <span style={{ marginRight: '10px' }}>จำนวน : </span>
                         <ButtonGroup className="me-2" aria-label="First group">
                             <Button variant="secondary" onClick={() => handleQuantityChange('decrease')}>-</Button>
                             <InputGroup>
                                 <InputGroup.Text id="btnGroupAddon"> {quantity} </InputGroup.Text>
                             </InputGroup>
-                            <Button variant="info" onClick={() => handleQuantityChange('increase')}>+</Button>
+                            <Button variant="danger" onClick={() => handleQuantityChange('increase')}>+</Button>
                         </ButtonGroup>
-
                     </div>
 
                     {/* Add to Cart and Buy Now buttons */}
@@ -306,11 +306,13 @@ const ProductDetail = () => {
                     boxShadow: '0 0 20px rgba(0, 0, 0, 0.2)',
                     transition: 'right 0.3s ease-in-out',
                     padding: '20px',
-                    overflowY: 'auto'
+                    overflowY: 'auto',
+                    display: 'flex',
+                    flexDirection: 'column'
                 }}
             >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                    <h3>Your Cart</h3>
+                    <h3><u>สรุปสินค้า</u></h3>
                     <button
                         style={{
                             border: 'none',
@@ -323,58 +325,60 @@ const ProductDetail = () => {
                         <FaTimes />
                     </button>
                 </div>
+
                 {/* Cart Items */}
                 <div>
-                    {/* Add your cart items here */}
-                    <img
-                        src={mainImage}
-                        alt={product.name}
-                        style={{
-                            width: '100px',
-                            height: 'auto',
-                            marginBottom: '20px',
-                            objectFit: 'contain',
-                            transition: 'transform 0.3s ease',
-                        }}
-                        onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                        onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
-                    />
+                    <div className="text-container">
+                        <img
+                            src={mainImage}
+                            alt={product.name}
+                            style={{
+                                width: '100px',
+                                height: 'auto',
+                                marginBottom: '20px',
+                                objectFit: 'contain',
+                                transition: 'transform 0.3s ease',
+                            }}
+                        />
 
-                    <h1 style={{ fontSize: '1.5em', marginBottom: '20px', fontWeight: 'bold' }}>
-                        {product.name}
-                    </h1>
+                        <div>
+                            <h1 style={{ fontSize: '1.5em', marginBottom: '20px', fontWeight: 'bold', paddingLeft: "1.5em" }}>
+                                {product.name}
+                            </h1>
 
-                    <p style={{ color: 'red', fontSize: '1.5em', marginBottom: '10px' }}>
-                        ฿{totalPrice.toLocaleString()}.00
-                    </p>
-
-                    <ButtonGroup className="me-2" aria-label="First group">
-                        <Button variant="secondary" onClick={() => handleQuantityChange('decrease')}>-</Button>
-                        <InputGroup>
-                            <InputGroup.Text id="btnGroupAddon"> {quantity} </InputGroup.Text>
-                        </InputGroup>
-                        <Button variant="info" onClick={() => handleQuantityChange('increase')}>+</Button>
-                    </ButtonGroup>
-
+                            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', paddingLeft: "1.5em" }}>
+                                <ButtonGroup className="me-2" aria-label="First group">
+                                    <Button variant="secondary" onClick={() => handleQuantityChange('decrease')}>-</Button>
+                                    <InputGroup>
+                                        <InputGroup.Text id="btnGroupAddon"> {quantity} </InputGroup.Text>
+                                    </InputGroup>
+                                    <Button variant="danger" onClick={() => handleQuantityChange('increase')}>+</Button>
+                                </ButtonGroup>
+                                <p style={{ color: 'red', fontSize: '1.5em', marginBottom: '10px' }}>
+                                    : ฿{totalPrice.toLocaleString()}.00
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div style={{ marginTop: '20px' }}>
-                    <button
+                <div  style={{ marginTop: 'auto' }}>
+                    <button class="glow-on-hover"
                         style={{
                             width: '100%',
                             height: '60px',
                             padding: '10px 20px',
                             backgroundColor: 'red',
-                            color: 'white',
                             border: 'none',
                             cursor: 'pointer',
-                            fontSize: '1em'
+                            fontSize: '1em',
                         }}
                     >
-                        ADD TO CART
+                        ไปที่ตะกร้า
                     </button>
                 </div>
             </div>
+
 
         </div>
     );
