@@ -6,14 +6,13 @@ import TopMenu from '../components/TopMenu';
 import Footer from '../components/Footer';
 import { useNavigate } from 'react-router-dom';
 
-import { FaTimes } from 'react-icons/fa';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import InputGroup from 'react-bootstrap/InputGroup';
 import "../index.css";
 
 
-const ProductDetail = ( { addToCart }) => {
+const ProductDetail = ({ addToCart }) => {
     const { productId } = useParams();
     const [product, setProduct] = useState(null);
     const [mainImage, setMainImage] = useState('');
@@ -92,8 +91,9 @@ const ProductDetail = ( { addToCart }) => {
     }
 
     const totalPrice = quantity * product.price;
-    
+
     const handleAddToCart = () => {
+        
         addToCart({
             id: product.id,
             name: product.name,
@@ -103,6 +103,7 @@ const ProductDetail = ( { addToCart }) => {
         });
         // นำทางไปยังหน้า CartDetail หรือแค่แจ้งเตือนว่าถูกเพิ่มสำเร็จ
         navigate('/CartDetail'); // หรือใช้ navigate('/allproducts') เพื่อกลับไปยัง AllProduct
+        
     };
 
     return (
@@ -179,7 +180,8 @@ const ProductDetail = ( { addToCart }) => {
                     </h1>
 
                     <p style={{ color: 'red', fontSize: '1.5em', marginBottom: '10px' }}>
-                        ฿{product.price.toLocaleString()}.00
+                        ฿{product.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+
                     </p>
 
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
@@ -189,7 +191,7 @@ const ProductDetail = ( { addToCart }) => {
                             <InputGroup>
                                 <InputGroup.Text id="btnGroupAddon"> {quantity} </InputGroup.Text>
                             </InputGroup>
-                            <Button variant="danger" onClick={() => handleQuantityChange('increase')}>+</Button>
+                            <Button variant="info" onClick={() => handleQuantityChange('increase')}>+</Button>
                         </ButtonGroup>
                     </div>
 
@@ -327,57 +329,47 @@ const ProductDetail = ( { addToCart }) => {
             >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                     <h3><u>สรุปสินค้า</u></h3>
-                    <button
-                        style={{
-                            border: 'none',
-                            backgroundColor: 'transparent',
-                            cursor: 'pointer',
-                            fontSize: '24px'
-                        }}
-                        onClick={toggleCartPanel}
-                    >
-                        <FaTimes />
-                    </button>
                 </div>
 
                 {/* Cart Items */}
                 <div>
-                    <div className="text-container">
-                        <img
-                            src={mainImage}
-                            alt={product.name}
-                            style={{
-                                width: '100px',
-                                height: 'auto',
-                                marginBottom: '20px',
-                                objectFit: 'contain',
-                                transition: 'transform 0.3s ease',
-                            }}
-                        />
+                    <img
+                        src={mainImage}
+                        alt={product.name}
+                        style={{
 
-                        <div>
-                            <h1 style={{ fontSize: '1.5em', marginBottom: '20px', fontWeight: 'bold', paddingLeft: "1.5em" }}>
-                                {product.name}
-                            </h1>
+                            width: '100px',
+                            height: 'auto',
+                            marginBottom: '20px',
+                            objectFit: 'contain',
+                            transition: 'transform 0.3s ease',
+                        }}
+                    />
 
-                            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', paddingLeft: "1.5em" }}>
-                                <ButtonGroup className="me-2" aria-label="First group">
-                                    <Button variant="secondary" onClick={() => handleQuantityChange('decrease')}>-</Button>
-                                    <InputGroup>
-                                        <InputGroup.Text id="btnGroupAddon"> {quantity} </InputGroup.Text>
-                                    </InputGroup>
-                                    <Button variant="danger" onClick={() => handleQuantityChange('increase')}>+</Button>
-                                </ButtonGroup>
-                                <p style={{ color: 'red', fontSize: '1.5em', marginBottom: '10px' }}>
-                                    : ฿{totalPrice.toLocaleString()}.00
-                                </p>
-                            </div>
-                        </div>
+                    <h1 style={{ fontSize: '1.5em', marginBottom: '20px', fontWeight: 'bold' }}>
+                        {product.name}
+                    </h1>
+
+                    <p style={{ color: 'red', fontSize: '1.5em', marginBottom: '10px' }}>
+                        ฿{totalPrice.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                    <span style={{ marginRight: '10px' }}>จำนวน : </span>
+                        <ButtonGroup className="me-2" aria-label="First group">
+                            <Button variant="secondary" onClick={() => handleQuantityChange('decrease')}>-</Button>
+                            <InputGroup>
+                                <InputGroup.Text id="btnGroupAddon"> {quantity} </InputGroup.Text>
+                            </InputGroup>
+                            <Button variant="info" onClick={() => handleQuantityChange('increase')}>+</Button>
+                        </ButtonGroup>
+
                     </div>
                 </div>
 
-                <div  style={{ marginTop: 'auto' }}>
-                    <button class="glow-on-hover"
+                <div style={{ marginTop: 'auto' }}>
+
+                    <button class="glow-on-hover1"
                         style={{
                             width: '100%',
                             height: '60px',
@@ -391,11 +383,24 @@ const ProductDetail = ( { addToCart }) => {
                     >
                         ไปที่ตะกร้า
                     </button>
+
+                    <button class="back-btn"
+                        style={{
+                            padding: '10px 20px',
+                            marginTop: '5%',
+                            cursor: 'pointer',
+                            fontSize: '1em',
+                        }}
+                        onClick={toggleCartPanel}
+                    >
+                        กลับไปช็อป
+                    </button>
+
                 </div>
             </div>
 
 
-        </div>
+        </div >
     );
 };
 

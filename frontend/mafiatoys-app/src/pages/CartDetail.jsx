@@ -33,6 +33,8 @@ const CartDetail = ({ cartItems, setCartItems }) => {
         );
     };
 
+
+
     const handleDelete = (id) => {
         setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
     };

@@ -8,7 +8,7 @@ import ProductDetail from "./pages/ProductsDetail";
 import Stores from "./pages/Stores"; // เพิ่มการนำเข้า Store
 import AllProducts from "./pages/AllProducts";
 import Profile from "./pages/Profile"; // นำเข้า Profile page
-import CartDetail from './pages/CartDetail';
+import CartDetail from "./pages/CartDetail";
 
 import Atongshopp from "./pages/Stores/Atongshopp";
 import Arttoys from "./pages/Stores/Arttoys";
@@ -46,9 +46,17 @@ function App() {
           <Route path="/stores" element={<Stores />} />
           <Route path="/allproducts" element={<AllProducts />} />
 
-          <Route path="/products/:productId" element={<ProductDetail addToCart={addToCart} />} />
-          <Route path="/CartDetail" element={<CartDetail cartItems={cartItems} setCartItems={setCartItems} />} />
-        <Route path="/Stores" element={<Stores />} />
+          <Route
+            path="/products/:productId"
+            element={<ProductDetail addToCart={addToCart} />}
+          />
+          <Route
+            path="/CartDetail"
+            element={
+              <CartDetail cartItems={cartItems} setCartItems={setCartItems} />
+            }
+          />
+          <Route path="/Stores" element={<Stores />} />
 
           <Route path="/Storepages/Atongshopp" element={<Atongshopp />} />
           <Route path="/Storepages/Arttoys" element={<Arttoys />} />

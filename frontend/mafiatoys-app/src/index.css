@@ -350,7 +350,9 @@ h4 {
   padding: 5px;
 }
 
-.glow-on-hover {
+
+/* go to cart btn  */
+.glow-on-hover1 {
   width: 220px;
   height: 50px;
   border: none;
@@ -363,7 +365,7 @@ h4 {
   border-radius: 10px;
 }
 
-.glow-on-hover:before {
+.glow-on-hover1:before {
   content: '';
   background: linear-gradient(90deg, #ff0000, #ff7300, #fffb00, #ff0000);
   position: absolute;
@@ -380,19 +382,19 @@ h4 {
   border-radius: 10px;
 }
 
-.glow-on-hover:active {
+.glow-on-hover1:active {
   color: #000
 }
 
-.glow-on-hover:active:after {
+.glow-on-hover1:active:after {
   background: transparent;
 }
 
-.glow-on-hover:hover:before {
+.glow-on-hover1:hover:before {
   opacity: 1;
 }
 
-.glow-on-hover:after {
+.glow-on-hover1:after {
   z-index: -1;
   content: '';
   position: absolute;
@@ -409,3 +411,20 @@ h4 {
   50% { background-position: 400% 0; }
   100% { background-position: 0 0; }
 }
+/* [end] go to cart btn  */
+
+/* go back btn  */
+.back-btn {
+  width: 100%;
+  height: 60px;
+  border: none;
+  outline: none;
+  color: white;
+  background: black;
+  cursor: pointer;
+  position: relative;
+  z-index: 0;
+  border-radius: 10px;
+}
+
+/* [end] go back btn  */
