@@ -5,7 +5,6 @@ import Footer from '../components/Footer';
 import RangeSlider from 'react-range-slider-input';
 import { Link } from 'react-router-dom';
 import 'react-range-slider-input/dist/style.css';
-import '../index.css';
 
 const AllProducts = () => {
     const [products, setProducts] = useState([]);
@@ -415,7 +414,7 @@ const AllProducts = () => {
                 
                 <div className="product-section">
                     <div className="sort-container-right">
-                        <label>Sort by: </label>
+                        <label>Sort by : </label>
                         <select onChange={handleSortChange} value={sortOption}>
                             <option value="">None</option>
                             <option value="price-asc">Price: Low to High</option>
@@ -453,7 +452,7 @@ const AllProducts = () => {
                                         <div className="container">
                                             <h5 align="left"><b style={{color: 'gray'}}>{product.sellers[0]?.name || "Unknown Shop"}</b></h5>
                                             <h6 align="left"><b>{product.name}</b></h6>
-                                            <p align="left"style={{ color: 'red', fontSize: '1.1em' }}>฿{product.price.toLocaleString()}.00</p>
+                                            <p align="left"style={{ color: 'red', fontSize: '1.1em' }}>฿{product.price.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                                         </div>
                                     </div>
                                 </Link>

@@ -42,7 +42,7 @@ const NewProducts = () => {
                     <Card.Body>
                       <Card.Title>{product.name}</Card.Title>
                       <Card.Text style={{color: 'red', fontWeight: 'none'}}>
-                        <strong>฿{product.price.toLocaleString()}.00</strong>
+                        <strong>฿{product.price.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
                       </Card.Text>
                     </Card.Body>
                   </Card>

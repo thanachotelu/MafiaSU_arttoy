@@ -10,7 +10,7 @@ const placeholderImage = '../assets/images/placeholder.jpg';
 const SearchResults = () => {
   const [products, setProducts] = useState([]);
   const [searchParams] = useSearchParams();
-  const [error, setError] = useState(null); // ใช้สำหรับเก็บข้อผิดพลาด
+  const [error, setError] = useState(null);
   const [sortOption, setSortOption] = useState('');
   const [sortedProducts, setSortedProducts] = useState([]);
 
