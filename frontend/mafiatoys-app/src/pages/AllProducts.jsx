@@ -3,8 +3,8 @@ import axios from 'axios';
 import TopMenu from '../components/TopMenu';
 import Footer from '../components/Footer';
 import RangeSlider from 'react-range-slider-input';
+import { Link } from 'react-router-dom';
 import 'react-range-slider-input/dist/style.css';
-import '../index.css';
 
 const AllProducts = () => {
     const [products, setProducts] = useState([]);
@@ -199,8 +199,8 @@ const AllProducts = () => {
                         </label>
                     </div>
 
-                    <div className="price-range-container">
-                        <div className="range-label">ช่วงราคา</div>
+                    <div className="price-range-container" style={{marginBottom: '20px'}}>
+                        <h2>Price Range</h2>
                         <RangeSlider
                             min={0}
                             max={20000}
@@ -214,6 +214,7 @@ const AllProducts = () => {
                             <span>฿{priceRange[1]}</span>
                         </div>
                     </div>
+
                     <h2>Brand</h2>
                     <div className="category-checkbox">
                         <label>
@@ -412,8 +413,8 @@ const AllProducts = () => {
                 </div>
                 
                 <div className="product-section">
-                <div className="sort-container-right">
-                        <label>Sort by: </label>
+                    <div className="sort-container-right">
+                        <label>Sort by : </label>
                         <select onChange={handleSortChange} value={sortOption}>
                             <option value="">None</option>
                             <option value="price-asc">Price: Low to High</option>
@@ -423,7 +424,9 @@ const AllProducts = () => {
                         </select>
                     </div>
                     <h1 className="title">All Products[{sortedProducts.length}]</h1>
-                    {sortedProducts.length === 0 && <p>No products found</p>}
+
+                    {sortedProducts.length.length === 0 && <p>No products found</p>}
+
                     <div className="product-grid">
                         {sortedProducts.map(product => {
                             // ตรวจสอบว่า images มีค่าหรือไม่ และเป็น Array หรือไม่
@@ -439,19 +442,21 @@ const AllProducts = () => {
                             const displayedImageUrl = productImages[product.product_id] || imageUrl || '/placeholder.jpg';
 
                             return (
-                                <div className="card" key={product.product_id}>
-                                    <img
-                                        src={displayedImageUrl} 
-                                        alt={product.name} 
-                                        className="product-image" 
-                                        onError={(e) => { e.target.src = '/placeholder.jpg'; }} // ใช้ placeholder ถ้าภาพโหลดไม่ได้
-                                    />
-                                    <div className="container">
-                                        <h6 align="left"><b>{product.sellers[0]?.name || "Unknown Shop"}</b></h6>
-                                        <h6 align="left"><b>{product.name}</b></h6>
-                                        <p align="left"style={{ color: 'red', fontSize: '1.1em' }}>฿{product.price}</p>
+                                <Link to={`/products/${product.product_id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    <div className="card" key={product.product_id} style={{ cursor: 'pointer' , height: '100%'}}>
+                                        <img
+                                            src={displayedImageUrl} 
+                                            alt={product.name} 
+                                            className="product-image" 
+                                            onError={(e) => { e.target.src = '/placeholder.jpg'; }} // ใช้ placeholder ถ้าภาพโหลดไม่ได้
+                                        />
+                                        <div className="container">
+                                            <h5 align="left"><b style={{color: 'gray'}}>{product.sellers[0]?.name || "Unknown Shop"}</b></h5>
+                                            <h6 align="left"><b>{product.name}</b></h6>
+                                            <p align="left"style={{ color: 'red', fontSize: '1.1em' }}>฿{product.price.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                                        </div>
                                     </div>
-                                </div>
+                                </Link>
                             );
                         })}
                     </div>

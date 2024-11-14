@@ -95,6 +95,70 @@ func (h *ProductHandlers) GetProducts(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+func (h *ProductHandlers) GetRecommendProduct(c *gin.Context) {
+	limitStr := c.DefaultQuery("limit", "3")
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid limit value"})
+		return
+	}
+
+	cursor := c.Query("cursor")
+	var decodedCursor string
+	if cursor != "" {
+		decodedCursor, err = decodeCursor(cursor)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid cursor"})
+			return
+		}
+	}
+
+	categoryIDStr := c.Query("category")
+	var categoryID int
+	if categoryIDStr != "" {
+		categoryID, err = strconv.Atoi(categoryIDStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid category ID"})
+			return
+		}
+	}
+
+	params := product.ProductQueryParams{
+		Cursor:      decodedCursor,
+		Limit:       limit,
+		Search:      c.Query("search"),
+		CategoryID:  categoryID,
+		SellerID:    c.Query("seller_id"),
+		Status:      c.Query("status"),
+		ProductType: c.Query("product_type"),
+		Sort:        c.Query("sort"),
+		Order:       c.Query("order"),
+	}
+
+	response, err := h.store.GetRecommendProduct(c.Request.Context(), params)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Encode the NextCursor before sending the response
+	if response.NextCursor != "" {
+		response.NextCursor = encodeCursor(response.NextCursor)
+	}
+
+	userTimezone := "Asia/Bangkok"
+	loc, err := time.LoadLocation(userTimezone)
+	if err != nil {
+		log.Fatal("ไม่สามารถโหลด timezone ได้:", err)
+	}
+
+	for i := range response.Items {
+		convertTimesToUserTimezone(&response.Items[i], loc)
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
 func encodeCursor(cursor string) string {
 	return base64.StdEncoding.EncodeToString([]byte(cursor))
 }
@@ -128,7 +192,7 @@ func (h *ProductHandlers) GetProduct(c *gin.Context) {
 }
 
 func (h *ProductHandlers) GetProductsByCategory(c *gin.Context) {
-	// ดึง category_id จาก URL parameter
+
 	categoryIDStr := c.Param("category_id")
 	categoryID, err := strconv.Atoi(categoryIDStr)
 	if err != nil {
@@ -136,39 +200,54 @@ func (h *ProductHandlers) GetProductsByCategory(c *gin.Context) {
 		return
 	}
 
-	// กำหนดพารามิเตอร์การ query
 	params := product.ProductQueryParams{
 		CategoryID: categoryID,
 	}
 
-	// เรียกใช้ฟังก์ชัน GetProducts เพื่อนำข้อมูลสินค้าตามหมวดหมู่
 	response, err := h.store.GetProducts(c.Request.Context(), params)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	// ส่งข้อมูลสินค้าตามหมวดหมู่กลับไปยัง client
 	c.JSON(http.StatusOK, response)
 }
 
+// UpdateOrderInventory
+type UpdateOrders struct {
+	ProductID string `json:"product_id"`
+	Quantity  int    `json:"quantity"`
+}
+
+func (h *ProductHandlers) UpdateOrderInventory(c *gin.Context) {
+	var req UpdateOrders
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
+		return
+	}
+
+	updatedInventory, err := h.store.UpdateOrderInventory(c.Request.Context(), req.ProductID, req.Quantity)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update inventory"})
+		return
+	}
+
+	c.JSON(http.StatusOK, updatedInventory)
+}
+
 func (h *ProductHandlers) GetProductsBySeller(c *gin.Context) {
-	// ดึง category_id จาก URL parameter
 	sellerID := c.Param("seller_id")
 
-	// กำหนดพารามิเตอร์การ query
 	params := product.ProductQueryParams{
 		SellerID: sellerID,
 	}
 
-	// เรียกใช้ฟังก์ชัน GetProducts เพื่อนำข้อมูลสินค้าตามหมวดหมู่
 	response, err := h.store.GetProducts(c.Request.Context(), params)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	// ส่งข้อมูลสินค้าตามหมวดหมู่กลับไปยัง client
 	c.JSON(http.StatusOK, response)
 }
 
@@ -276,12 +355,6 @@ func (h *ProductHandlers) DeleteProductImage(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusNoContent, nil)
-}
-
-func (h *ProductHandlers) GetCategories(c *gin.Context) {
-	// ดึงรายการหมวดหมู่จากฐานข้อมูล (ในตัวอย่างนี้ยังไม่มีการเชื่อมต่อฐานข้อมูล)
-	categories := []string{"arttoy", "figure", "accessory"}
-	c.JSON(http.StatusOK, categories)
 }
 
 func (h *ProductHandlers) HealthCheck(c *gin.Context) {

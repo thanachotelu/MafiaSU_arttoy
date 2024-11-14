@@ -1,8 +1,9 @@
 import React, { useState , useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaSearch, FaShoppingCart, FaUser } from 'react-icons/fa';
+import { FaSearch, FaRegUserCircle , FaShoppingBag} from 'react-icons/fa';
 import { Button, Modal, Dropdown } from 'react-bootstrap'; // เพิ่ม Dropdown จาก react-bootstrap
 import GoogleAuth from './GoogleAuth';
+import { useCart } from '../context/CartContext';
 
 const TopMenu = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -10,6 +11,8 @@ const TopMenu = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const { cartItems } = useCart();
+  const cartItemCount = cartItems.length;
 
   useEffect(() => {
     // ดึงข้อมูลผู้ใช้จาก sessionStorage เมื่อหน้าเว็บถูกโหลดหรือรีเฟรช
@@ -44,7 +47,7 @@ const TopMenu = () => {
     <nav className="navbar navbar-expand-lg navbar-dark bg-light p-0">
       <div className="container-fluid">
         <Link className="navbar-brand" to="/" style={{ color: '#333333', fontWeight: 'bold' }}>
-          <img src="/assets/toys_logo.png" alt="Logo" width="120" height="90" />
+          <img src="/assets/logo.png" alt="Logo" width="170" height= "80" />
         </Link>
 
         <button
@@ -61,14 +64,10 @@ const TopMenu = () => {
         
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav">
-            <li className="nav-item">
-              <Link className="nav-link" to="/new" style={{ color: '#000000', fontWeight: 'bold', fontSize: '14px' }}>
-                ใหม่&แนะนำ
-              </Link>
-            </li>
+
             <li className="nav-item">
               <Link className="nav-link" to="/allproducts" style={{ color: '#000000', fontWeight: 'bold', fontSize: '14px' }}>
-                สินค้าทั้งหมด
+                All Products
               </Link>
             </li>
             
@@ -91,29 +90,41 @@ const TopMenu = () => {
                   display: dropdownOpen ? 'block' : 'none',
                 }}
               >
-                  <Link className="dropdown-item" to="/store-1" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
+                  <Link className="dropdown-item" to="/stores/atongshopp" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
                     <img src="/assets/images/logo_images_Atongshopp.png" alt="Atongshopp" width="30" height="30" style={{ marginRight: '10px' }} />
                     ATONG SHOPP 玩具
                   </Link>
 
-                  <Link className="dropdown-item" to="/store-2" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
+                  <Link className="dropdown-item" to="/stores/arttoys" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
                     <img src="/assets/images/logo_images_arttoys.png" alt="Arttoys" width="30" height="30" style={{ marginRight: '10px' }} />
                     ART TOYS
                   </Link>
 
-                  <Link className="dropdown-item" to="/store-3" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
+                  <Link className="dropdown-item" to="/stores/gachabox" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
                     <img src="/assets/images/logo_images_gachabox.png" alt="Arttoys" width="30" height="30" style={{ marginRight: '10px' }} />
                     GACHABOX
                   </Link>
 
-                  <Link className="dropdown-item" to="/store-4" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
+                  <Link className="dropdown-item" to="/stores/popmart" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
                     <img src="/assets/images/logo_images_popmart.png" alt="Arttoys" width="30" height="30" style={{ marginRight: '10px' }} />
                     POP MART
                   </Link>
 
-                  <Link className="dropdown-item" to="/store-5" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
+                  <Link className="dropdown-item" to="/stores/pieceofjoy" style={{ display: 'flex', alignItems: 'center', padding: '8px 20px', color: '#000' ,fontWeight: 'bold'}}>
                     <img src="/assets/images/logo_images_pieceofjoy.png" alt="Arttoys" width="30" height="30" style={{ marginRight: '10px' }} />
                     PIECE OF JOY
+                  </Link>
+
+                  <Link
+                    className="dropdown-item" to="/stores" style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '8px 20px',
+                      color: '#808080',  // สีเทา
+                      fontWeight: 'bold',
+                      fontSize: '12px'     // ขนาดฟอนต์เล็กลง
+                    }}>
+                    All SHOP
                   </Link>
                 </div>
                 
@@ -138,7 +149,7 @@ const TopMenu = () => {
 
         <div className="d-flex">
           <Link className="btn btn-light" to="/cart">
-            <FaShoppingCart /> <span className="badge bg-danger"></span>
+            <FaShoppingBag /> <span className="badge bg-danger">{cartItemCount > 0 && cartItemCount.toString() }</span>
           </Link>
 
 
@@ -148,19 +159,18 @@ const TopMenu = () => {
                 <img
                   src={user.picture} // รูปภาพจาก Google
                   alt="user-profile"
-                  style={{ borderRadius: '50%', width: '40px' }}
+                  style={{ borderRadius: '50%', width: '30px' }}
                   referrerPolicy="no-referrer"
                 />
               </Dropdown.Toggle>
 
               <Dropdown.Menu>
-                <Dropdown.Item as={Link} to="/profile">My Profile</Dropdown.Item>
                 <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
           ) : (
             <Button variant="light" className="ms-2" onClick={handleShow}>
-              <FaUser /> เข้าสู่ระบบ
+              <FaRegUserCircle /> Login
             </Button>
           )}
 

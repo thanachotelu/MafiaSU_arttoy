@@ -11,8 +11,10 @@ const SearchResults = () => {
   const [products, setProducts] = useState([]);
   const [sortedProducts, setSortedProducts] = useState([]);
   const [searchParams] = useSearchParams();
+
+  const [error, setError] = useState(null);
   const [sortOption, setSortOption] = useState('');
-  const [error, setError] = useState(null); // ใช้สำหรับเก็บข้อผิดพลาด
+  const [sortedProducts, setSortedProducts] = useState([]);
 
   const searchQuery = searchParams.get('q');
 
@@ -54,6 +56,10 @@ const sortProducts = (products, option) => {
     }
   };
 
+  const handleSortChange = (e) => {
+    setSortOption(e.target.value);
+  };
+
   useEffect(() => {
     fetchProducts(searchQuery);
   }, [searchQuery]);
@@ -62,6 +68,17 @@ const sortProducts = (products, option) => {
     setSortedProducts(sortProducts(products, sortOption));
   }, [sortOption, products]);
 
+
+  const sortProducts = (products, option) => {
+    let sorted = [...products];
+    if (option === 'price-asc') {
+      sorted.sort((a, b) => a.price - b.price); // เรียงจากราคาต่ำไปสูง
+    } else if (option === 'price-desc') {
+      sorted.sort((a, b) => b.price - a.price); // เรียงจากราคาสูงไปต่ำ
+    }
+    return sorted;
+  };
+
   return (
     <div>
       <TopMenu />
@@ -69,17 +86,20 @@ const sortProducts = (products, option) => {
       <Container className="my-5">
       <div className="sort-container-right">
         <h2 className="text-center mb-4">ผลการค้นหาสำหรับ "{searchQuery}"</h2>
-            <label>Sort by: </label>
-            <select onChange={handleSortChange} value={sortOption}>
+
+            <label>Sort by : </label>
+            <select onChange={handleSortChange} value={sortOption} style={{marginBottom: '30px'}}>
                 <option value="">None</option>
                 <option value="price-asc">Price: Low to High</option>
                 <option value="price-desc">Price: High to Low</option>
             </select>
         </div>   
+
+
         <Row>
           {error ? (
             <p className="text-center">{error}</p> // แสดงข้อความข้อผิดพลาด
-          ) : sortedProducts.length > 0 ? (
+          ) : products.length > 0 ? (
             sortedProducts.map((product) => {
               const primaryImage = product.images.find((img) => img.is_primary)?.image_url || placeholderImage;
 
@@ -99,30 +119,21 @@ const sortProducts = (products, option) => {
                       </Col>
                       <Col md={6}>
                         <Card.Body>
-                          <Card.Title style={{ fontSize: '1.5rem', color: '#007bff' }}>
-                            {product.name}
-                          </Card.Title>
-                          <div style={{ fontSize: '1.2rem', color: '#ff6600' }}>
-                            <strong>{product.price ? `฿${product.price}` : 'ราคาไม่ระบุ'}</strong>
-                          </div>
-                          <Card.Text>
-                            {product.description ? product.description : 'ไม่มีคำอธิบายสินค้า'}
-                          </Card.Text>
                           <div className="d-flex align-items-center">
                             <span className="badge bg-success me-2">New</span>
-                            {product.price && (
-                              <span className="badge bg-danger me-2">Hot</span>
-                            )}
+                          </div>
+                          <Card.Title style={{ fontSize: '1.5rem', color: '#000000', fontWeight: 'bold' }}>
+                            {product.name}
+                          </Card.Title>
+                          <div style={{ fontSize: '1.2rem', color: 'red' }}>
+                            <strong>{product.price ? `฿${product.price.toLocaleString()}.00` : 'ราคาไม่ระบุ'}</strong>
                           </div>
                         </Card.Body>
                       </Col>
                       <Col md={3} className="d-flex align-items-center justify-content-center">
                         <div>
-                          <Button variant="primary" className="me-2">
-                            เพิ่มลงในตะกร้า
-                          </Button>
-                          <Link to={`/product/${product.id}`}>
-                            <Button variant="outline-secondary">
+                          <Link to={`/products/${product.product_id}`}>
+                            <Button variant="danger" className="me-2">
                               ดูรายละเอียด
                             </Button>
                           </Link>

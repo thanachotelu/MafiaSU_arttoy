@@ -1,74 +1,138 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useParams , useNavigate} from 'react-router-dom';
+import { Container } from 'react-bootstrap';
 import TopMenu from '../components/TopMenu';
 import Footer from '../components/Footer';
+import { useCart } from '../context/CartContext';
+import { FaTimes } from 'react-icons/fa';
+import Button from 'react-bootstrap/Button';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import InputGroup from 'react-bootstrap/InputGroup';
+import "../index.css";
+
 
 const ProductDetail = () => {
     const { productId } = useParams();
-
-    const product = {
-        id: productId,
-        name: `CRYBABY × Powerpuff Girls Series Figures`,
-        price: '฿380.00',
-        imageUrl: 'https://prod-eurasian-res.popmart.com/default/20240304_164111_296715__1200x1200.jpg?x-oss-process=image/resize,p_30,format,webp,format,webp',
-        description: 'Series of collectible figures from Powerpuff Girls collaboration with CRYBABY.',
-        shop: 'Pop Mart Store',
-        imageGallery: [
-            'https://prod-eurasian-res.popmart.com/default/20240304_164111_296715__1200x1200.jpg?x-oss-process=image/resize,p_30,format,webp,format,webp',
-            'https://prod-eurasian-res.popmart.com/default/20240307_135857_061608__1200x1200.jpg?x-oss-process=image/resize,p_30,format,webp,format,webp',
-            'https://prod-eurasian-res.popmart.com/default/20240307_135900_754875__1200x1200.jpg?x-oss-process=image/resize,p_30,format,webp,format,webp',
-            'https://prod-eurasian-res.popmart.com/default/20240307_135904_928134__1200x1200.jpg?x-oss-process=image/resize,p_30,format,webp,format,webp',
-            'https://prod-eurasian-res.popmart.com/default/20240307_135907_345467__1200x1200.jpg?x-oss-process=image/resize,p_30,format,webp,format,webp'
-        ]
-    };
-
-    const [mainImage, setMainImage] = useState(product.imageUrl);
+    const [product, setProduct] = useState(null);
+    const [mainImage, setMainImage] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [quantity, setQuantity] = useState(1);
     const [isFiguresOpen, setIsFiguresOpen] = useState(false);
     const [isShippingOpen, setIsShippingOpen] = useState(false);
-    const [selectedSize, setSelectedSize] = useState('กล่องเดียว'); // Initial selected size
-    const [quantity, setQuantity] = useState(1); // Initial quantity
+    const [isCartPanelOpen, setIsCartPanelOpen] = useState(false); //Side panel
+    const { addToCart } = useCart();
+    const navigate = useNavigate();
 
-    // Function to handle size selection
-    const handleSizeSelect = (size) => {
-        setSelectedSize(size);
+    const handleAddToCart = () => {
+        addToCart(product, quantity);
+        navigate('/cart');
     };
 
-    // Function to handle quantity change
-    const handleQuantityChange = (operation) => {
-        setQuantity((prevQuantity) => {
-            if (operation === 'decrease' && prevQuantity > 1) {
-                return prevQuantity - 1;
-            }
-            if (operation === 'increase') {
-                return prevQuantity + 1;
-            }
-            return prevQuantity;
-        });
+    const handleBuyNow = () => {
+        addToCart(product, quantity);
+        navigate('/checkout');
     };
+
+    const handleQuantityChange = (action) => {
+        if (action === 'increase') {
+            setQuantity(prev => prev + 1);
+        } else if (action === 'decrease' && quantity > 1) {
+            setQuantity(prev => prev - 1);
+        }
+    };
+
+    const totalPrice = product ? product.price * quantity : 0;
+
+    const toggleCartPanel = () => {
+        setIsCartPanelOpen(!isCartPanelOpen);
+    };
+
+    useEffect(() => {
+        const fetchProductDetails = async () => {
+            try {
+                setIsLoading(true);
+                const response = await axios.get(`/api/v1/products/${productId}`);
+                const productData = response.data;
+
+                if (!productData) {
+                    throw new Error('ไม่พบข้อมูลสินค้า');
+                }
+
+                setProduct(productData);
+                // ตั้งค่ารูปภาพหลักจาก is_primary หรือรูปแรก
+                const primaryImage = productData.images.find(img => img.is_primary)?.image_url
+                    || productData.images[0]?.image_url;
+                setMainImage(primaryImage);
+
+            } catch (error) {
+                console.error('Error fetching product details:', error);
+                setError('ไม่สามารถโหลดข้อมูลสินค้าได้ กรุณาลองใหม่อีกครั้ง');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchProductDetails();
+    }, [productId]);
+
+    if (isLoading) {
+        return (
+            <div style={{ textAlign: 'center', padding: '2rem' }}>
+                <p>กำลังโหลดข้อมูล...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div style={{ textAlign: 'center', padding: '2rem', color: 'red' }}>
+                <p>{error}</p>
+                <button onClick={() => window.location.reload()}>ลองใหม่อีกครั้ง</button>
+            </div>
+        );
+    }
+
+    if (!product) {
+        return (
+            <div style={{ textAlign: 'center', padding: '2rem' }}>
+                <p>ไม่พบข้อมูลสินค้า</p>
+            </div>
+        );
+    }
 
     return (
         <div>
             <TopMenu />
-            <div
-                className="product-detail-container"
-                style={{
-                    display: 'flex',
-                    padding: '20px',
-                    justifyContent: 'center',
-                    alignItems: 'flex-start',
-                    margin: 'auto',
-                    maxWidth: '900px'
-                }}
-            >
+            <Container className="product-detail-container" style={{
+                display: 'flex',
+                padding: '20px',
+                justifyContent: 'center',
+                alignItems: 'flex-start',
+                margin: 'auto',
+                maxWidth: '3000px'
+            }}>
                 {/* Image Gallery */}
-                <div className="image-gallery" style={{ display: 'flex', flexDirection: 'column', marginRight: '20px' }}>
-                    {product.imageGallery.map((img, index) => (
+                <div className="image-gallery" style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    marginRight: '20px'
+                }}>
+                    {product.images.map((img) => (
                         <img
-                            key={index}
-                            src={img}
-                            alt={`${product.name} - Gallery ${index + 1}`}
-                            style={{ width: '60px', height: '60px', marginBottom: '10px', cursor: 'pointer', border: '1px solid #ccc' }}
-                            onClick={() => setMainImage(img)}
+                            key={img.id}
+                            src={img.image_url}
+                            alt={product.name}
+                            style={{
+                                width: '80px',
+                                height: '80px',
+                                marginBottom: '10px',
+                                cursor: 'pointer',
+                                border: mainImage === img.image_url ? '2px solid #007bff' : '1px solid #ccc',
+                                objectFit: 'cover'
+                            }}
+                            onClick={() => setMainImage(img.image_url)}
                         />
                     ))}
                 </div>
@@ -78,165 +142,266 @@ const ProductDetail = () => {
                     <img
                         src={mainImage}
                         alt={product.name}
-                        style={{ width: '300px', height: 'auto', marginBottom: '20px' }}
+                        style={{
+                            width: '500px',
+                            height: 'auto',
+                            marginBottom: '20px',
+                            objectFit: 'contain',
+                            transition: 'transform 0.3s ease',
+                        }}
+                        onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+                        onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
                     />
                 </div>
 
                 {/* Product Info */}
-                <div className="product-info" style={{ flex: 1, maxWidth: '300px', color: '#333' }}>
-                    <h1 style={{ fontSize: '1.5em', marginBottom: '10px', fontWeight: 'bold' }}>{product.name}</h1>
-                    <p style={{ color: 'red', fontWeight: 'bold', fontSize: '1.5em', marginBottom: '10px' }}>{product.price}</p>
-
-                    {/* ขนาด Section */}
-                    <div style={{ marginBottom: '20px' }}>
-                        <span style={{ display: 'block', fontWeight: 'bold', marginBottom: '5px' }}>ขนาด</span>
-
-                        <button
-                            style={{
-                                padding: 'calc(.875rem - 1px) calc(1.5rem - 1px)',
-                                border: '1px solid rgba(0, 0, 0, 0.1)',
-                                borderRadius: '.25rem',
-                                backgroundColor: selectedSize === 'กล่องเดียว' ? '#e0e0e0' : '#f8f8f8', // Set background color based on selectedSize
-                                boxShadow: 'rgba(0, 0, 0, 0.02) 0 1px 3px 0',
-                                color: 'rgba(0, 0, 0, 0.85)',
-                                cursor: 'pointer',
-                                display: 'inline-flex',
-                                fontFamily: 'system-ui, -apple-system, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif',
-                                fontSize: '16px',
-                                fontWeight: '600',
-                                justifyContent: 'center',
-                                lineHeight: '1.25',
-                                minHeight: '3rem',
-                                textDecoration: 'none',
-                                transition: 'all 250ms',
-                                userSelect: 'none',
-                                verticalAlign: 'baseline',
-                                marginRight: '10px',
-                            }}
-                            onClick={() => handleSizeSelect('กล่องเดียว')}
-                        >
-                            กล่องเดียว
-                        </button>
-
-                        <button
-                            style={{
-                                padding: 'calc(.875rem - 1px) calc(1.5rem - 1px)',
-                                border: '1px solid rgba(0, 0, 0, 0.1)',
-                                borderRadius: '.25rem',
-                                backgroundColor: selectedSize === 'ทั้งชุด' ? '#e0e0e0' : '#f8f8f8', // Set background color based on selectedSize
-                                boxShadow: 'rgba(0, 0, 0, 0.02) 0 1px 3px 0',
-                                color: 'rgba(0, 0, 0, 0.85)',
-                                cursor: 'pointer',
-                                display: 'inline-flex',
-                                fontFamily: 'system-ui, -apple-system, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif',
-                                fontSize: '16px',
-                                fontWeight: '600',
-                                justifyContent: 'center',
-                                lineHeight: '1.25',
-                                minHeight: '3rem',
-                                textDecoration: 'none',
-                                transition: 'all 250ms',
-                                userSelect: 'none',
-                                verticalAlign: 'baseline',
-                            }}
-                            onClick={() => handleSizeSelect('ทั้งชุด')}
-                        >
-                            ทั้งชุด
-                        </button>
-                    </div>
-
-                    {/* จำนวน Section */}
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-                        <span style={{ fontWeight: 'bold', marginRight: '10px' }}>จำนวน:</span>
-                        <button
-                            style={{ padding: '8px', height: '40px', border: '1px solid #ccc', cursor: 'pointer' }}
-                            onClick={() => handleQuantityChange('decrease')}
-                        >
-                            -
-                        </button>
-                        <input
-                            type="text"
-                            value={quantity}
-                            readOnly
-                            style={{ width: '50px', height: '40px', textAlign: 'center', margin: '0 5px', border: '1px solid #ccc' }}
-                        />
-                        <button
-                            style={{ padding: '5px', height: '40px', border: '1px solid #ccc', cursor: 'pointer' }}
-                            onClick={() => handleQuantityChange('increase')}
-                        >
-                            +
-                        </button>
-                    </div>
-
-                    {/* ปุ่มเพิ่มไปยังตะกร้า และ ซื้อเลย */}
-                    <button style={{
-                        padding: '10px 20px',
-                        backgroundColor: 'black',
+                <div className="product-info" style={{ flex: 1, maxWidth: '500px', color: '#333', textAlign: 'left' }}>
+                    {/* "New" Tag */}
+                    <span style={{
+                        display: 'inline-block',
+                        backgroundColor: 'green',
                         color: 'white',
-                        border: 'none',
-                        marginRight: '10px',
-                        cursor: 'pointer',
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        fontSize: '0.9em',
                         fontWeight: 'bold',
-                        fontSize: '1em'
-                    }}>เพิ่มไปยังตะกร้า</button>
-                    <button style={{
-                        padding: '10px 20px',
-                        backgroundColor: 'red',
-                        color: 'white',
-                        border: 'none',
-                        cursor: 'pointer',
-                        fontWeight: 'bold',
-                        fontSize: '1em'
-                    }}>ซื้อเลย</button>
-                </div>
-            </div>
+                        marginBottom: '5px'
+                    }}>
+                        New
+                    </span>
 
-            {/* Accordion Sections */}
-            <div style={{ maxWidth: '900px', margin: 'auto', padding: '20px' }}>
-                {/* Figures Section */}
-                <div
-                    onClick={() => setIsFiguresOpen(!isFiguresOpen)}
-                    style={{
-                        padding: '10px 0',
-                        borderBottom: '1px solid #ccc',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        cursor: 'pointer',
-                        fontWeight: 'bold'
-                    }}
-                >
-                    ฟิกเกอร์ทั้งหมด
-                    <span>{isFiguresOpen ? '▲' : '▼'}</span>
-                </div>
-                {isFiguresOpen && (
-                    <div style={{ padding: '10px 0', color: '#666' }}>
-                        <p>{product.description}</p>
-                    </div>
-                )}
 
-                {/* Shipping and After-Sales Section */}
-                <div
-                    onClick={() => setIsShippingOpen(!isShippingOpen)}
-                    style={{
-                        padding: '10px 0',
-                        borderBottom: '1px solid #ccc',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        cursor: 'pointer',
-                        fontWeight: 'bold'
-                    }}
-                >
-                    การจัดส่งและบริการหลังการขาย
-                    <span>{isShippingOpen ? '▲' : '▼'}</span>
-                </div>
-                {isShippingOpen && (
-                    <div style={{ padding: '10px 0', color: '#666' }}>
-                        ข้อมูลการจัดส่งและบริการหลังการขาย...
+                    <h1 style={{ fontSize: '1.5em', marginBottom: '20px', fontWeight: 'bold' }}>
+                        {product.name}
+                    </h1>
+
+                    <p style={{ color: 'red', fontSize: '1.5em', marginBottom: '10px' }}>
+                        ฿{product.price.toLocaleString()}.00
+                    </p>
+
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                        <span style={{ marginRight: '10px' }}>QUANTITY : </span>
+                        <ButtonGroup className="me-2" aria-label="First group">
+                            <Button variant="secondary" onClick={() => handleQuantityChange('decrease')}>-</Button>
+                            <InputGroup>
+                                <InputGroup.Text id="btnGroupAddon"> {quantity} </InputGroup.Text>
+                            </InputGroup>
+                            <Button variant="info" onClick={() => handleQuantityChange('increase')}>+</Button>
+                        </ButtonGroup>
+
                     </div>
-                )}
-            </div>
+
+                    {/* Add to Cart and Buy Now buttons */}
+                    <div style={{ marginTop: '20px' }}>
+                        <button style={{
+                            width: '200px',
+                            height: '60px',
+                            padding: '10px 20px',
+                            backgroundColor: 'black',
+                            color: 'white',
+                            border: 'none',
+                            marginRight: '20px',
+                            cursor: 'pointer',
+                            fontSize: '1em',
+                        }}
+                            onClick={toggleCartPanel}
+                        >
+                            ADD TO CART
+                        </button>
+                        <button style={{
+                            width: '200px',
+                            height: '60px',
+                            padding: '10px 20px',
+                            backgroundColor: 'red',
+                            color: 'white',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: '1em',
+                        }}
+                            onClick={handleBuyNow}
+                        >
+                            BUY NOW
+                        </button>
+                    </div>
+
+                    <p style={{ marginTop: '20px', color: 'gray' }}><strong>สินค้าคงเหลือ: </strong>{product.inventory.quantity} ชิ้น</p>
+                </div>
+
+            </Container>
+
+            {/* Product Details Section */}
+            <Container style={{ maxWidth: '75%', margin: 'auto', padding: '20px', textAlign: 'left' }}>
+                <div style={{ padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+                    {/* Figures Section */}
+                    <div
+                        onClick={() => setIsFiguresOpen(!isFiguresOpen)}
+                        style={{
+                            padding: '10px 0',
+                            borderBottom: '1px solid #ccc',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            cursor: 'pointer',
+                            fontWeight: 'bold'
+                        }}
+                    >
+                        รายละเอียดสินค้า
+                        <span>{isFiguresOpen ? '▲' : '▼'}</span>
+                    </div>
+                    {isFiguresOpen && (
+                        <div style={{ padding: '10px 0', color: '#666' }}>
+                            <p>{product.description}</p>
+
+                            {/* Brand Info */}
+                            {product.brand && (
+                                <p><strong> แบรนด์ : </strong>{product.brand}</p>
+                            )}
+
+                            {/* Model Number */}
+                            {product.model_number && (
+                                <p><strong> รหัสสินค้า: </strong>{product.model_number}</p>
+                            )}
+
+
+                            {/* Categories */}
+                            {product.categories && product.categories.length > 0 && (
+                                <div style={{ marginTop: '15px' }}>
+                                    <strong> หมวดหมู่ : </strong>
+                                    {product.categories.map(cat => cat.name).join(', ')}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Shipping and After-Sales Section */}
+                    <div
+                        onClick={() => setIsShippingOpen(!isShippingOpen)}
+                        style={{
+                            padding: '10px 0',
+                            borderBottom: '1px solid #ccc',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            cursor: 'pointer',
+                            fontWeight: 'bold',
+                        }}
+                    >
+                        การจัดส่งและบริการหลังการขาย
+                        <span>{isShippingOpen ? '▲' : '▼'}</span>
+                    </div>
+                    {isShippingOpen && (
+                        <div style={{ padding: '10px 0', color: '#666' }}>
+                            1.การจัดส่ง: <br />
+                            (1) FLASH DELIVERY (1-3 วัน) <br />
+                            (2) การจัดส่งแบบมาตรฐาน (7-14 วัน) <br />
+                            2.ข้อบกพร่อง: <br />
+                            (1) สินค้าลิมิเต็ดอิดิชั่นไม่มีบริการแลกเปลียนคืนนี้พบว่าไม่พบข้อบกพร่องที่สำคัญในสินค้าโปรดติดต่อ SU-CENTRAL@SU.AC.TH พร้อมหมายเลขเร่งด่วนที่เกี่ยวข้อง การกล่องแกะภายในห้าวัน (5) วันที่ได้รับสินค้า <br />
+                            (2) เพื่อให้ทราบข้อมูลการติดตามด้วยอีเมลดังกล่าวในการสั่งซื้อคุณจะได้รับการติดต่อจากตัวแทนฝั่งจะช่วยในเรื่องนี้<br />
+                            (3) เรื่องราวโต้แย้งในเรื่องคืนเงินหรือในกรณีสินค้าส่วนใหญ่ควรถ่ายวิดีโอพัสดุภายในสองวันในส่วนของพัสดุจะต้องต้องปฏิบัติตามใบส่งสินค้าตามปกติของพัสดุและข้อเพื่อตรวจสอบของสินค้าคอนโซล<br />
+                            3.ค่าภาษี<br />
+                            สำหรับการจัดส่งด่วนในบางครั้งต้องรับผิดชอบค่าใช้จ่ายภาษีภายนอก
+                        </div>
+                    )}
+                </div>
+
+            </Container>
 
             <Footer />
+
+            {/* Sliding Cart Panel */}
+                <div
+                className={`cart-panel ${isCartPanelOpen ? 'open' : ''}`}
+                style={{
+                    position: 'fixed',
+                    top: 0,
+                    right: isCartPanelOpen ? 0 : '-400px',
+                    width: '400px',
+                    height: '100%',
+                    backgroundColor: '#E4E0E1',
+                    boxShadow: '0 0 20px rgba(0, 0, 0, 0.2)',
+                    transition: 'right 0.3s ease-in-out',
+                    padding: '20px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between', // This will push content to the bottom
+                    overflowY: 'auto'
+                }}
+            >
+                <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                        <h3>Your Cart</h3>
+                        <button
+                            style={{
+                                border: 'none',
+                                backgroundColor: 'transparent',
+                                cursor: 'pointer',
+                                fontSize: '24px'
+                            }}
+                            onClick={toggleCartPanel}
+                        >
+                            <FaTimes />
+                        </button>
+                    </div>
+
+                    {/* Cart Item */}
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+                        {/* Product Image */}
+                        <img
+                            src={mainImage}
+                            alt={product.name}
+                            style={{
+                                width: '80px',
+                                height: '80px',
+                                marginRight: '20px',
+                                objectFit: 'contain',
+                                transition: 'transform 0.3s ease',
+                            }}
+                            onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+                            onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                        />
+
+                        {/* Product Details */}
+                        <div style={{ flexGrow: 1 }}>
+                            <h1 style={{ fontSize: '1.2em', margin: '0 0 10px', fontWeight: 'bold' }}>
+                                {product.name}
+                            </h1>
+
+                            <p style={{ color: 'red', fontSize: '1.2em', margin: 0 }}>
+                                ฿{product.price.toLocaleString()}.00
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Quantity Control */}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+                        <ButtonGroup className="me-2" aria-label="First group">
+                            <Button variant="secondary" onClick={() => handleQuantityChange('decrease')}>-</Button>
+                            <InputGroup>
+                                <InputGroup.Text id="btnGroupAddon"> {quantity} </InputGroup.Text>
+                            </InputGroup>
+                            <Button variant="info" onClick={() => handleQuantityChange('increase')}>+</Button>
+                        </ButtonGroup>
+                    </div>
+                </div>
+
+                {/* Total Price and Add to Cart Button at the Bottom */}
+                <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                    <p style={{ fontSize: '1.2em', fontWeight: 'bold', marginBottom: '10px' }}>
+                        Total: ฿{totalPrice.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                    <button class="glow-on-hover1"
+                        style={{
+                            width: '100%',
+                            height: '60px',
+                            padding: '10px 20px',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: '1em'
+                        }}
+                        onClick={handleAddToCart}>
+                        ADD TO CART
+                    </button>
+                </div>
+            </div>
+
         </div>
     );
 };
