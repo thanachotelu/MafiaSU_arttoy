@@ -9,12 +9,28 @@ const placeholderImage = '../assets/images/placeholder.jpg';
 
 const SearchResults = () => {
   const [products, setProducts] = useState([]);
+  const [sortedProducts, setSortedProducts] = useState([]);
   const [searchParams] = useSearchParams();
+
   const [error, setError] = useState(null);
   const [sortOption, setSortOption] = useState('');
   const [sortedProducts, setSortedProducts] = useState([]);
 
   const searchQuery = searchParams.get('q');
+
+  const handleSortChange = (e) => {
+    setSortOption(e.target.value);
+};
+
+const sortProducts = (products, option) => {
+  let sorted = [...products];
+  if (option === 'price-asc') {
+    sorted.sort((a, b) => a.price - b.price); // เรียงจากราคาต่ำไปสูง
+  } else if (option === 'price-desc') {
+    sorted.sort((a, b) => b.price - a.price); // เรียงจากราคาสูงไปต่ำ
+  }
+  return sorted;
+};
 
   // ฟังก์ชันดึงข้อมูลสินค้าจาก API
   const fetchProducts = (query) => {
@@ -52,6 +68,7 @@ const SearchResults = () => {
     setSortedProducts(sortProducts(products, sortOption));
   }, [sortOption, products]);
 
+
   const sortProducts = (products, option) => {
     let sorted = [...products];
     if (option === 'price-asc') {
@@ -69,6 +86,7 @@ const SearchResults = () => {
       <Container className="my-5">
       <div className="sort-container-right">
         <h2 className="text-center mb-4">ผลการค้นหาสำหรับ "{searchQuery}"</h2>
+
             <label>Sort by : </label>
             <select onChange={handleSortChange} value={sortOption} style={{marginBottom: '30px'}}>
                 <option value="">None</option>
@@ -76,6 +94,7 @@ const SearchResults = () => {
                 <option value="price-desc">Price: High to Low</option>
             </select>
         </div>   
+
 
         <Row>
           {error ? (

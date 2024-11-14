@@ -6,6 +6,7 @@ import SearchResults from './pages/SearchResults';
 import ProductDetail from './pages/ProductsDetail';
 import Stores from './pages/Stores';
 import AllProducts from './pages/AllProducts';
+
 import Popmart from './pages/Popmart';
 import Gachabox from './pages/Gachabox';
 import Atongshopp from './pages/Atongshopp';
