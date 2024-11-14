@@ -9,6 +9,7 @@ import { FaTimes } from 'react-icons/fa';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import InputGroup from 'react-bootstrap/InputGroup';
+import "../index.css";
 
 
 const ProductDetail = () => {
@@ -36,6 +37,8 @@ const ProductDetail = () => {
             setQuantity(prev => prev - 1);
         }
     };
+
+    const totalPrice = product ? product.price * quantity : 0;
 
     const toggleCartPanel = () => {
         setIsCartPanelOpen(!isCartPanelOpen);
@@ -298,7 +301,7 @@ const ProductDetail = () => {
             <Footer />
 
             {/* Sliding Cart Panel */}
-            <div
+                <div
                 className={`cart-panel ${isCartPanelOpen ? 'open' : ''}`}
                 style={{
                     position: 'fixed',
@@ -310,72 +313,85 @@ const ProductDetail = () => {
                     boxShadow: '0 0 20px rgba(0, 0, 0, 0.2)',
                     transition: 'right 0.3s ease-in-out',
                     padding: '20px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between', // This will push content to the bottom
                     overflowY: 'auto'
                 }}
             >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                    <h3>Your Cart</h3>
-                    <button
-                        style={{
-                            border: 'none',
-                            backgroundColor: 'transparent',
-                            cursor: 'pointer',
-                            fontSize: '24px'
-                        }}
-                        onClick={toggleCartPanel}
-                    >
-                        <FaTimes />
-                    </button>
-                </div>
-                {/* Cart Items */}
                 <div>
-                    {/* Add your cart items here */}
-                    <img
-                        src={mainImage}
-                        alt={product.name}
-                        style={{
-                            width: '100px',
-                            height: 'auto',
-                            marginBottom: '20px',
-                            objectFit: 'contain',
-                            transition: 'transform 0.3s ease',
-                        }}
-                        onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                        onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
-                    />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                        <h3>Your Cart</h3>
+                        <button
+                            style={{
+                                border: 'none',
+                                backgroundColor: 'transparent',
+                                cursor: 'pointer',
+                                fontSize: '24px'
+                            }}
+                            onClick={toggleCartPanel}
+                        >
+                            <FaTimes />
+                        </button>
+                    </div>
 
-                    <h1 style={{ fontSize: '1.5em', marginBottom: '20px', fontWeight: 'bold' }}>
-                        {product.name}
-                    </h1>
+                    {/* Cart Item */}
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+                        {/* Product Image */}
+                        <img
+                            src={mainImage}
+                            alt={product.name}
+                            style={{
+                                width: '80px',
+                                height: '80px',
+                                marginRight: '20px',
+                                objectFit: 'contain',
+                                transition: 'transform 0.3s ease',
+                            }}
+                            onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+                            onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                        />
 
-                    <p style={{ color: 'red', fontSize: '1.5em', marginBottom: '10px' }}>
-                        ฿{product.price.toLocaleString()}.00
-                    </p>
+                        {/* Product Details */}
+                        <div style={{ flexGrow: 1 }}>
+                            <h1 style={{ fontSize: '1.2em', margin: '0 0 10px', fontWeight: 'bold' }}>
+                                {product.name}
+                            </h1>
 
-                    <ButtonGroup className="me-2" aria-label="First group">
-                        <Button variant="secondary" onClick={() => handleQuantityChange('decrease')}>-</Button>
-                        <InputGroup>
-                            <InputGroup.Text id="btnGroupAddon"> {quantity} </InputGroup.Text>
-                        </InputGroup>
-                        <Button variant="info" onClick={() => handleQuantityChange('increase')}>+</Button>
-                    </ButtonGroup>
+                            <p style={{ color: 'red', fontSize: '1.2em', margin: 0 }}>
+                                ฿{product.price.toLocaleString()}.00
+                            </p>
+                        </div>
+                    </div>
 
+                    {/* Quantity Control */}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+                        <ButtonGroup className="me-2" aria-label="First group">
+                            <Button variant="secondary" onClick={() => handleQuantityChange('decrease')}>-</Button>
+                            <InputGroup>
+                                <InputGroup.Text id="btnGroupAddon"> {quantity} </InputGroup.Text>
+                            </InputGroup>
+                            <Button variant="info" onClick={() => handleQuantityChange('increase')}>+</Button>
+                        </ButtonGroup>
+                    </div>
                 </div>
 
-                <div style={{ marginTop: '20px' }}>
-                    <button
+                {/* Total Price and Add to Cart Button at the Bottom */}
+                <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                    <p style={{ fontSize: '1.2em', fontWeight: 'bold', marginBottom: '10px' }}>
+                        Total: ฿{totalPrice.toLocaleString()}.00
+                    </p>
+                    <button class="glow-on-hover1"
                         style={{
                             width: '100%',
                             height: '60px',
                             padding: '10px 20px',
-                            backgroundColor: 'red',
-                            color: 'white',
                             border: 'none',
                             cursor: 'pointer',
                             fontSize: '1em'
                         }}
                         onClick={handleAddToCart}>
-                        ADD TO CART 
+                        ADD TO CART
                     </button>
                 </div>
             </div>

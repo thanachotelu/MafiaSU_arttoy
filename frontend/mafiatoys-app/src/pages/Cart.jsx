@@ -3,32 +3,17 @@ import React from 'react';
 import { useCart } from '../context/CartContext';
 import TopMenu from '../components/TopMenu';
 import Footer from '../components/Footer';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
-    const { cartItems, setCartItems } = useCart();
+    const { cartItems, updateItemQuantity, removeFromCart } = useCart();
     const navigate = useNavigate();
-
-    const handleQuantityChange = (id, action) => {
-        setCartItems(prevItems =>
-            prevItems.map((item) =>
-                item.id === id
-                    ? { ...item, quantity: action === 'increase' ? item.quantity + 1 : Math.max(1, item.quantity - 1) }
-                    : item
-            )
-        );
-    };    
-
-    const handleDelete = (id) => {
-        setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-    };
 
     const calculateSubtotal = () => {
         return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
     };
 
     const handleCheckout = () => {
-        setCartItems([]);
         navigate('/checkout');
     };
 
@@ -59,48 +44,48 @@ const Cart = () => {
                 <div style={styles.contentContainer}>
                     <div style={styles.cartContent}>
                         <h2>My Cart</h2>
-                        {cartItems.map((item) => {
-                            const primaryImage = item.images?.find(image => image.is_primary)?.image_url;
-                            return (
-                                <div key={item.id} style={styles.cartItem}>
-                                    <img 
-                                        src={primaryImage || 'path/to/fallback/image.jpg'}
-                                        alt={item.name}
-                                        style={styles.itemImage}
-                                        onError={(e) => { e.target.src = 'path/to/fallback/image.jpg'; }}
-                                    />
-                                    <div style={styles.itemDetails}>
-                                        <h4>{item.name}</h4>
-                                        <p style={styles.price.discounted}>฿{item.price.toFixed(2)}</p>
-                                        <div style={styles.quantityContainer}>
-                                            <span style={{ marginRight: '10px' }}>จำนวน</span>
-                                            <button
-                                                style={styles.quantityButton}
-                                                onClick={() => handleQuantityChange(item.id, 'decrease')}
-                                                disabled={item.quantity === 1}
-                                            >
-                                                -
-                                            </button>
-                                            <input
-                                                type="text"
-                                                value={item.quantity}
-                                                readOnly
-                                                style={styles.quantityInput}
-                                            />
-                                            <button
-                                                style={styles.quantityButton}
-                                                onClick={() => handleQuantityChange(item.id, 'increase')}
-                                            >
-                                                +
-                                            </button>
-                                        </div>
+                        {cartItems.map((item) => (
+                            <div key={item.product_id} style={styles.cartItem}>
+                                <img
+                                    src={item.image_url || 'https://via.placeholder.com/150'}
+                                    alt={item.name}
+                                    style={styles.itemImage}
+                                    onError={(e) => { e.target.src = 'https://via.placeholder.com/150'; }}
+                                />
+                                <div style={styles.itemDetails}>
+                                    <h4>{item.name}</h4>
+                                    <p style={styles.price.discounted}>฿{item.price.toFixed(2)}</p>
+                                    <div style={styles.quantityContainer}>
+                                        <span style={{ marginRight: '10px' }}>จำนวน</span>
+                                        <button
+                                            style={styles.quantityButton}
+                                            onClick={() => updateItemQuantity(item.product_id, item.quantity - 1)}
+                                            disabled={item.quantity === 1}
+                                        >
+                                            -
+                                        </button>
+                                        <input
+                                            type="text"
+                                            value={item.quantity}
+                                            readOnly
+                                            style={styles.quantityInput}
+                                        />
+                                        <button
+                                            style={styles.quantityButton}
+                                            onClick={() => updateItemQuantity(item.product_id, item.quantity + 1)}
+                                        >
+                                            +
+                                        </button>
                                     </div>
-                                    <div style={styles.itemTotalPrice}>฿{item.price.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} 
-                                    </div>
-                                    <button style={styles.deleteBtn} onClick={() => handleDelete(item.id)}>🗑️</button>
                                 </div>
-                            );
-                        })}
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <div style={styles.itemTotalPrice}>
+                                        ฿{(item.price * item.quantity).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </div>
+                                    <button style={styles.deleteBtn} onClick={() => removeFromCart(item.product_id)}>🗑️</button>
+                                </div>
+                            </div>
+                        ))}
                     </div>
 
                     <div style={styles.orderSummary}>
@@ -120,7 +105,7 @@ const Cart = () => {
                         <button style={styles.checkoutBtn} onClick={handleCheckout}>Checkout</button>
                     </div>
                 </div>
-                </div>
+            </div>
             <Footer style={styles.footer} />
         </div>
     );
