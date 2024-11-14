@@ -120,6 +120,7 @@ type EcommerceDatabase interface {
 	UpdateProduct(ctx context.Context, id string, update UpdateProduct) (Product, error)
 	DeleteProduct(ctx context.Context, id string) error
 	GetProducts(ctx context.Context, params ProductQueryParams) (*ProductResponse, error)
+	GetRecommendProdcut(ctx context.Context, params ProductQueryParams) (*ProductResponse, error)
 	GetProductImages(ctx context.Context, productID string) ([]ProductImage, error)
 	AddProductImage(ctx context.Context, productID string, image NewProductImage) (ProductImage, error)
 	UpdateProductImage(ctx context.Context, productID, imageID string, update UpdateProductImage) (ProductImage, error)
@@ -385,6 +386,163 @@ func (pdb *PostgresDB) GetProducts(ctx context.Context, params ProductQueryParam
 	query += fmt.Sprintf(" ORDER BY %s %s, p.product_id ASC", sortColumn, orderDirection)
 
 	// การกำหนดค่า limit
+	limit := 3
+	if params.Limit > 0 && params.Limit <= 100 {
+		limit = params.Limit
+	}
+	query += fmt.Sprintf(" LIMIT $%d", placeholderCount)
+	args = append(args, limit+1)
+	placeholderCount++
+
+	// log.Printf("Query: %s", query)
+	// log.Printf("Args: %v", args)
+
+	// ดำเนินการ query และประมวลผลผลลัพธ์
+	rows, err := pdb.DB.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get products: %v", err)
+	}
+	defer rows.Close()
+
+	var products []ProductItem
+	for rows.Next() {
+		var product ProductItem
+		var category Category
+		var inventory Inventory
+		var seller Seller
+		if err := rows.Scan(
+			&product.ID, &product.Name, &product.Description, &product.Brand,
+			&product.ModelNumber, &product.Price, &product.Status,
+			&product.ProductType, &product.CreatedAt, &product.UpdatedAt,
+			&seller.ID, &seller.Name,
+			&category.ID, &category.Name,
+			&inventory.Quantity, &inventory.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("failed to scan product: %v", err)
+		}
+		product.Categories = []Category{category}
+		product.Inventory = inventory
+		product.Sellers = []Seller{seller}
+
+		// การดึงข้อมูลรูปภาพและตัวเลือกของผลิตภัณฑ์
+		product.Images, err = pdb.GetProductImages(ctx, product.ID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get product images: %v", err)
+		}
+
+		products = append(products, product)
+		if len(products) == limit+1 {
+			break
+		}
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("failed to iterate over products: %v", err)
+	}
+
+	response := &ProductResponse{
+		Items: products[:min(len(products), limit)],
+		Limit: limit,
+	}
+
+	if len(products) > limit {
+		lastProduct := products[limit-1]
+		response.NextCursor = encodeCursor(Cursor{CreatedAt: lastProduct.CreatedAt, ProductID: lastProduct.ID})
+	} else {
+		response.NextCursor = ""
+	}
+
+	return response, nil
+}
+
+func (pdb *PostgresDB) GetRecommendProdcut(ctx context.Context, params ProductQueryParams) (*ProductResponse, error) {
+	query := `
+        SELECT p.product_id, p.name, p.description, p.brand, p.model_number, p.price, 
+               p.status, p.product_type, p.created_at, p.updated_at,
+			   s.seller_id, s.name as seller_name,
+               c.category_id, c.name as category_name,
+               i.quantity, i.updated_at as inventory_updated_at
+        FROM products p
+		LEFT JOIN sellers s ON p.seller_id = s.seller_id
+        LEFT JOIN categories c ON p.category_id = c.category_id
+        LEFT JOIN inventory i ON p.product_id = i.product_id
+        WHERE 1=1`
+
+	args := []interface{}{}
+	placeholderCount := 1
+
+	// การจัดการพารามิเตอร์ cursor
+	if params.Cursor != "" {
+		cursor, err := decodeCursor(params.Cursor)
+		if err != nil {
+			return nil, fmt.Errorf("invalid cursor: %v", err)
+		}
+		query += fmt.Sprintf(" AND (p.created_at, p.product_id) > ($%d, $%d)", placeholderCount, placeholderCount+1)
+		args = append(args, cursor.CreatedAt, cursor.ProductID)
+		placeholderCount += 2
+	}
+
+	// การจัดการพารามิเตอร์ search
+	if params.Search != "" {
+		query += fmt.Sprintf(" AND (p.name ILIKE $%d OR p.description ILIKE $%d)", placeholderCount, placeholderCount+1)
+		args = append(args, "%"+params.Search+"%", "%"+params.Search+"%")
+		placeholderCount += 2
+	}
+
+	// การจัดการพารามิเตอร์ category_id
+	if params.CategoryID != 0 {
+		query += fmt.Sprintf(" AND p.category_id = $%d", placeholderCount)
+		args = append(args, params.CategoryID)
+		placeholderCount++
+	}
+
+	// การจัดการพารามิเตอร์ seller_id
+	if params.SellerID != "" {
+		query += fmt.Sprintf(" AND p.seller_id = $%d", placeholderCount)
+		args = append(args, params.SellerID)
+		placeholderCount++
+	}
+
+	// การจัดการพารามิเตอร์ status
+	if params.Status != "" {
+		query += fmt.Sprintf(" AND p.status = $%d", placeholderCount)
+		args = append(args, params.Status)
+		placeholderCount++
+	}
+
+	// การจัดการพารามิเตอร์ product_type
+	if params.ProductType != "" {
+		query += fmt.Sprintf(" AND p.product_type = $%d", placeholderCount)
+		args = append(args, params.ProductType)
+		placeholderCount++
+	}
+
+	// การจัดการ ORDER BY ด้วย sort และ order
+	sortFields := map[string]string{
+		"name":       "p.name",
+		"price":      "p.price",
+		"created_at": "p.created_at",
+	}
+
+	orderDirections := map[string]string{
+		"asc":  "ASC",
+		"desc": "DESC",
+	}
+
+	sortColumn, ok := sortFields[params.Sort]
+	if !ok {
+		// กำหนดค่า default หาก sort ไม่ถูกต้องหรือไม่ได้ระบุ
+		sortColumn = "p.created_at"
+	}
+
+	orderDirection, ok := orderDirections[strings.ToLower(params.Order)]
+	if !ok {
+		// กำหนดค่า default หาก order ไม่ถูกต้องหรือไม่ได้ระบุ
+		orderDirection = "ASC"
+	}
+
+	query += fmt.Sprintf(" ORDER BY RANDOM(),%s %s, p.product_id ASC", sortColumn, orderDirection)
+
+	// การกำหนดค่า limit
 	limit := 20
 	if params.Limit > 0 && params.Limit <= 100 {
 		limit = params.Limit
@@ -603,6 +761,10 @@ func (s *Store) DeleteProduct(ctx context.Context, id string) error {
 
 func (s *Store) GetProducts(ctx context.Context, params ProductQueryParams) (*ProductResponse, error) {
 	return s.db.GetProducts(ctx, params)
+}
+
+func (s *Store) GetRecommendProdcut(ctx context.Context, params ProductQueryParams) (*ProductResponse, error) {
+	return s.db.GetRecommendProdcut(ctx, params)
 }
 
 func (s *Store) GetProductImages(ctx context.Context, productID string) ([]ProductImage, error) {
