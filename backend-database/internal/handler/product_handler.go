@@ -159,27 +159,6 @@ func (h *ProductHandlers) GetRecommendProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-type UpdateOrders struct {
-	ProductID string `json:"product_id"`
-	Quantity  int    `json:"quantity"`
-}
-
-func (h *ProductHandlers) UpdateOrderInventory(c *gin.Context) {
-	var req UpdateOrders
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
-		return
-	}
-
-	updatedInventory, err := h.store.UpdateOrderInventory(c.Request.Context(), req.ProductID, req.Quantity)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update inventory"})
-		return
-	}
-
-	c.JSON(http.StatusOK, updatedInventory)
-}
-
 func encodeCursor(cursor string) string {
 	return base64.StdEncoding.EncodeToString([]byte(cursor))
 }
@@ -232,6 +211,28 @@ func (h *ProductHandlers) GetProductsByCategory(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response)
+}
+
+// UpdateOrderInventory
+type UpdateOrders struct {
+	ProductID string `json:"product_id"`
+	Quantity  int    `json:"quantity"`
+}
+
+func (h *ProductHandlers) UpdateOrderInventory(c *gin.Context) {
+	var req UpdateOrders
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
+		return
+	}
+
+	updatedInventory, err := h.store.UpdateOrderInventory(c.Request.Context(), req.ProductID, req.Quantity)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update inventory"})
+		return
+	}
+
+	c.JSON(http.StatusOK, updatedInventory)
 }
 
 func (h *ProductHandlers) GetProductsBySeller(c *gin.Context) {

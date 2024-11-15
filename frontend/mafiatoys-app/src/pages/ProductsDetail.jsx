@@ -30,6 +30,11 @@ const ProductDetail = () => {
         navigate('/cart');
     };
 
+    const handleBuyNow = () => {
+        addToCart(product, quantity);
+        navigate('/checkout');
+    };
+
     const handleQuantityChange = (action) => {
         if (action === 'increase') {
             setQuantity(prev => prev + 1);
@@ -213,6 +218,7 @@ const ProductDetail = () => {
                             cursor: 'pointer',
                             fontSize: '1em',
                         }}
+                            onClick={handleBuyNow}
                         >
                             BUY NOW
                         </button>
