@@ -1,8 +1,9 @@
 import React, { useState , useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaSearch, FaShoppingCart, FaUser } from 'react-icons/fa';
+import { FaSearch, FaRegUserCircle , FaShoppingBag} from 'react-icons/fa';
 import { Button, Modal, Dropdown } from 'react-bootstrap'; // เพิ่ม Dropdown จาก react-bootstrap
 import GoogleAuth from './GoogleAuth';
+import { useCart } from '../context/CartContext';
 
 const TopMenu = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -10,6 +11,8 @@ const TopMenu = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const { cartItems } = useCart();
+  const cartItemCount = cartItems.length;
 
   useEffect(() => {
     // ดึงข้อมูลผู้ใช้จาก sessionStorage เมื่อหน้าเว็บถูกโหลดหรือรีเฟรช
@@ -44,7 +47,7 @@ const TopMenu = () => {
     <nav className="navbar navbar-expand-lg navbar-dark bg-light p-0">
       <div className="container-fluid">
         <Link className="navbar-brand" to="/" style={{ color: '#333333', fontWeight: 'bold' }}>
-          <img src="/assets/toys_logo.png" alt="Logo" width="120" height="90" />
+          <img src="/assets/logo.png" alt="Logo" width="170" height= "80" />
         </Link>
 
         <button
@@ -146,7 +149,7 @@ const TopMenu = () => {
 
         <div className="d-flex">
           <Link className="btn btn-light" to="/cart">
-            <FaShoppingCart /> <span className="badge bg-danger"></span>
+            <FaShoppingBag /> <span className="badge bg-danger">{cartItemCount > 0 && cartItemCount.toString() }</span>
           </Link>
 
 
@@ -156,19 +159,18 @@ const TopMenu = () => {
                 <img
                   src={user.picture} // รูปภาพจาก Google
                   alt="user-profile"
-                  style={{ borderRadius: '50%', width: '40px' }}
+                  style={{ borderRadius: '50%', width: '30px' }}
                   referrerPolicy="no-referrer"
                 />
               </Dropdown.Toggle>
 
               <Dropdown.Menu>
-                <Dropdown.Item as={Link} to="/profile">My Profile</Dropdown.Item>
                 <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
           ) : (
             <Button variant="light" className="ms-2" onClick={handleShow}>
-              <FaUser /> Login
+              <FaRegUserCircle /> Login
             </Button>
           )}
 

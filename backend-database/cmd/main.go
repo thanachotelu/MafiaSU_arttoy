@@ -101,7 +101,8 @@ func main() {
 			products.GET("/images/:id", h.GetProductImages)
 			products.GET("/category/:category_id", h.GetProductsByCategory)
 			products.GET("/seller/:seller_name", h.GetProductsBySeller)
-			products.GET("/recommend", h.GetRecommendProdcut)
+			products.GET("/recommend", h.GetRecommendProduct)
+			products.PUT("/orders", h.UpdateOrderInventory)
 		}
 	}
 

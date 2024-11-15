@@ -108,6 +108,11 @@ type Seller struct {
 	Contact string `json:"contact"`
 }
 
+type UpdateOrders struct {
+	ProductID string `json:"product_id"`
+	Quantity  int    `json:"quantity"`
+}
+
 type ProductOption struct {
 	ID     string          `json:"id"`
 	Name   string          `json:"name"`
@@ -120,7 +125,8 @@ type EcommerceDatabase interface {
 	UpdateProduct(ctx context.Context, id string, update UpdateProduct) (Product, error)
 	DeleteProduct(ctx context.Context, id string) error
 	GetProducts(ctx context.Context, params ProductQueryParams) (*ProductResponse, error)
-	GetRecommendProdcut(ctx context.Context, params ProductQueryParams) (*ProductResponse, error)
+	GetRecommendProduct(ctx context.Context, params ProductQueryParams) (*ProductResponse, error)
+	UpdateOrderInventory(ctx context.Context, productID string, quantity int) (Inventory, error)
 	GetProductImages(ctx context.Context, productID string) ([]ProductImage, error)
 	AddProductImage(ctx context.Context, productID string, image NewProductImage) (ProductImage, error)
 	UpdateProductImage(ctx context.Context, productID, imageID string, update UpdateProductImage) (ProductImage, error)
@@ -454,7 +460,7 @@ func (pdb *PostgresDB) GetProducts(ctx context.Context, params ProductQueryParam
 	return response, nil
 }
 
-func (pdb *PostgresDB) GetRecommendProdcut(ctx context.Context, params ProductQueryParams) (*ProductResponse, error) {
+func (pdb *PostgresDB) GetRecommendProduct(ctx context.Context, params ProductQueryParams) (*ProductResponse, error) {
 	query := `
         SELECT p.product_id, p.name, p.description, p.brand, p.model_number, p.price, 
                p.status, p.product_type, p.created_at, p.updated_at,
@@ -611,6 +617,31 @@ func (pdb *PostgresDB) GetRecommendProdcut(ctx context.Context, params ProductQu
 	return response, nil
 }
 
+func (pdb *PostgresDB) UpdateOrderInventory(ctx context.Context, productID string, quantity int) (Inventory, error) {
+	var inventory Inventory
+
+	err := pdb.QueryRowContext(ctx, "SELECT quantity FROM inventory WHERE product_id = $1", productID).Scan(&inventory.Quantity)
+	if err != nil {
+		return Inventory{}, err
+	}
+
+	if inventory.Quantity+quantity < 0 {
+		return Inventory{}, fmt.Errorf("insufficient inventory: cannot reduce quantity below zero")
+	}
+
+	_, err = pdb.ExecContext(ctx, "UPDATE inventory SET quantity = quantity - $1, updated_at = CURRENT_DATE WHERE product_id = $2", quantity, productID)
+	if err != nil {
+		return Inventory{}, err
+	}
+
+	err = pdb.QueryRowContext(ctx, "SELECT quantity, updated_at FROM inventory WHERE product_id = $1", productID).Scan(&inventory.Quantity, &inventory.UpdatedAt)
+	if err != nil {
+		return Inventory{}, err
+	}
+
+	return inventory, nil
+}
+
 func min(a, b int) int {
 	if a < b {
 		return a
@@ -763,8 +794,12 @@ func (s *Store) GetProducts(ctx context.Context, params ProductQueryParams) (*Pr
 	return s.db.GetProducts(ctx, params)
 }
 
-func (s *Store) GetRecommendProdcut(ctx context.Context, params ProductQueryParams) (*ProductResponse, error) {
-	return s.db.GetRecommendProdcut(ctx, params)
+func (s *Store) GetRecommendProduct(ctx context.Context, params ProductQueryParams) (*ProductResponse, error) {
+	return s.db.GetRecommendProduct(ctx, params)
+}
+
+func (s *Store) UpdateOrderInventory(ctx context.Context, productID string, quantity int) (Inventory, error) {
+	return s.db.UpdateOrderInventory(ctx, productID, quantity)
 }
 
 func (s *Store) GetProductImages(ctx context.Context, productID string) ([]ProductImage, error) {

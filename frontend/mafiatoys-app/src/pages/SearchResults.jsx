@@ -10,7 +10,7 @@ const placeholderImage = '../assets/images/placeholder.jpg';
 const SearchResults = () => {
   const [products, setProducts] = useState([]);
   const [searchParams] = useSearchParams();
-  const [error, setError] = useState(null); // ใช้สำหรับเก็บข้อผิดพลาด
+  const [error, setError] = useState(null);
   const [sortOption, setSortOption] = useState('');
   const [sortedProducts, setSortedProducts] = useState([]);
 
@@ -113,9 +113,6 @@ const SearchResults = () => {
                       </Col>
                       <Col md={3} className="d-flex align-items-center justify-content-center">
                         <div>
-                          <Button variant="danger" className="me-2">
-                            เพิ่มลงในตะกร้า
-                          </Button>
                           <Link to={`/products/${product.product_id}`}>
                             <Button variant="outline-secondary">
                               ดูรายละเอียด
