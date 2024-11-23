@@ -4,6 +4,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import TopMenu from '../components/TopMenu';
 import Footer from '../components/Footer';
+import Sorting from '../components/Sorting';
 
 const placeholderImage = '../assets/images/placeholder.jpg';
 
@@ -69,12 +70,9 @@ const SearchResults = () => {
       <Container className="my-5">
       <div className="sort-container-right">
         <h2 className="text-center mb-4">ผลการค้นหาสำหรับ "{searchQuery}"</h2>
-            <label>Sort by : </label>
-            <select onChange={handleSortChange} value={sortOption} style={{marginBottom: '30px'}}>
-                <option value="">None</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-            </select>
+          <div className="sort-container-center" style={{ marginBottom: '30px' }}>
+            <Sorting sortOption={sortOption} onSortChange={handleSortChange} />
+          </div>
         </div>   
 
         <Row>

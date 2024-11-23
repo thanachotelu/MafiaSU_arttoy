@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import RangeSlider from 'react-range-slider-input';
 import 'react-range-slider-input/dist/style.css';
 import '../index.css';
+import Sorting from '../components/Sorting';
 
 const Pieceofjoy = () => {
   const [products, setProducts] = useState([]);
@@ -118,10 +119,10 @@ if (error) return <div>{error}</div>;
     <div>
       <TopMenu />
 
-      <BannerShop storeName="Piece of joy" backgroundColor="#f48fb1" banner_img1="https://scontent.fbkk13-3.fna.fbcdn.net/v/t39.30808-6/346975532_193998963556760_4073645957057748162_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=eZC_8NtbuAwQ7kNvgFlqXWz&_nc_zt=23&_nc_ht=scontent.fbkk13-3.fna&_nc_gid=AeL31NZ1vSyNjUiMresnOn-&oh=00_AYALNhV3TLJtpnPWh5JuLfOUyEq81ohG8K-rtMMBWQfzwQ&oe=6737BAC4"
-                banner_img2="https://scontent.fbkk8-2.fna.fbcdn.net/v/t39.30808-6/465737692_1084221606960560_6886901789086080647_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=833d8c&_nc_ohc=lS75l6lKuu8Q7kNvgHHa1YD&_nc_zt=23&_nc_ht=scontent.fbkk8-2.fna&_nc_gid=A5W3foXEQNXqzDDJLK4De3Q&oh=00_AYAZFzGCzXAhvNf8YtQXRHguBVKcPuHkqWnUPn0JThPwjg&oe=6737E0B3"
-                banner_img3="https://scontent.fbkk8-2.fna.fbcdn.net/v/t39.30808-6/465271364_1084221796960541_4030137183314992019_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=833d8c&_nc_ohc=6BPmMsfOsDkQ7kNvgEbMxZR&_nc_zt=23&_nc_ht=scontent.fbkk8-2.fna&_nc_gid=AOKWAbSfZbDUUE3MoPyvBQs&oh=00_AYAVkMwpTHmEVQXQFKRgkDk00dr08LdAdFEEoP9fA09BeQ&oe=6737B7B6"
-                width_img2="55%" height_img2="55%" width_img3="40%" height_img3="40%"
+      <BannerShop storeName="Piece of joy" backgroundColor="#f48fb1" banner_img1="/assets/images/banner_pieceofjoy.png"
+                banner_img2="/assets/images/promo_pieceofjoy1.png"
+                banner_img3="/assets/images/promo_pieceofjoy2.png"
+                width_img2="29%" height_img2="50%" width_img3="40%" height_img3="40%"
       />
 
 
@@ -217,18 +218,10 @@ if (error) return <div>{error}</div>;
         </div>
 
         <div className="product-section">
-          <div className="sort-container-right">
-            <label>Sort by: </label>
-            <select onChange={handleSortChange} value={sortOption}>
-              <option value="">None</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-              <option value="name-asc">Name: A-Z</option>
-              <option value="name-desc">Name: Z-A</option>
-            </select>
-          </div>
-
           <h1 className="title">All Products[{sortedProducts.length}]</h1>
+          <div className="sort-container-right" style={{marginBottom: '30px'}}>
+            <Sorting sortOption={sortOption} onSortChange={handleSortChange} />
+          </div>
           {sortedProducts.length.length === 0 && <p>No products found</p>}
           <div className="product-grid">
             {sortedProducts.map(product => {

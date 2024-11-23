@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import RangeSlider from 'react-range-slider-input';
 import 'react-range-slider-input/dist/style.css';
 import '../index.css';
+import Sorting from '../components/Sorting';
 
 const Gachabox = () => {
   const [products, setProducts] = useState([]);
@@ -119,9 +120,9 @@ if (error) return <div>{error}</div>;
       <TopMenu />
 
       <BannerShop storeName="Gachabox" backgroundColor="#FFD700" banner_img1="/assets/images/logo_gachabox.jpg"
-                banner_img2="https://scontent.fbkk8-2.fna.fbcdn.net/v/t39.30808-6/465866070_960482722774081_8596527507718089336_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=127cfc&_nc_ohc=tko_14XsVz8Q7kNvgHbmgfy&_nc_zt=23&_nc_ht=scontent.fbkk8-2.fna&_nc_gid=AYtX6h7RxLKDM3Pbzm88sr1&oh=00_AYBqHRRDcyWOaTWCqlyz26ZyVbkNo_j0JjtpDBgD7lOBdQ&oe=6737C5A4"
-                banner_img3="https://scontent.fbkk9-3.fna.fbcdn.net/v/t39.30808-6/465777239_957222976433389_592922328259176680_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=127cfc&_nc_ohc=K1hEv_w6hOQQ7kNvgGHQH8p&_nc_zt=23&_nc_ht=scontent.fbkk9-3.fna&_nc_gid=AVhcBoXKz18su6BmynvJ11v&oh=00_AYCZPRMH_eYEFVuT6-n1g4cdjWtF7uJzao4-y5rae0xT9Q&oe=6737EDA5"
-                width_img2="49%" height_img2="49%" width_img3="51%" height_img3="51%"
+                banner_img2="/assets/images/promo_gachabox1.png"
+                banner_img3="/assets/images/promo_gachabox2.png"
+                width_img2="49%" height_img2="49%" width_img3="48%" height_img3="48%"
       />
 
 
@@ -217,18 +218,10 @@ if (error) return <div>{error}</div>;
         </div>
 
         <div className="product-section">
-          <div className="sort-container-right">
-            <label>Sort by: </label>
-            <select onChange={handleSortChange} value={sortOption}>
-              <option value="">None</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-              <option value="name-asc">Name: A-Z</option>
-              <option value="name-desc">Name: Z-A</option>
-            </select>
-          </div>
-
           <h1 className="title">All Products[{sortedProducts.length}]</h1>
+          <div className="sort-container-right" style={{marginBottom: '30px'}}>
+            <Sorting sortOption={sortOption} onSortChange={handleSortChange} />
+          </div>
           {sortedProducts.length.length === 0 && <p>No products found</p>}
           <div className="product-grid">
             {sortedProducts.map(product => {
