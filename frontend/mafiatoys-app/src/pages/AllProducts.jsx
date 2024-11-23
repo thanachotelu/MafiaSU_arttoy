@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import RangeSlider from 'react-range-slider-input';
 import { Link } from 'react-router-dom';
 import 'react-range-slider-input/dist/style.css';
+import Sorting from '../components/Sorting';
 
 const AllProducts = () => {
     const [products, setProducts] = useState([]);
@@ -413,18 +414,10 @@ const AllProducts = () => {
                 </div>
                 
                 <div className="product-section">
-                    <div className="sort-container-right">
-                        <label>Sort by : </label>
-                        <select onChange={handleSortChange} value={sortOption}>
-                            <option value="">None</option>
-                            <option value="price-asc">Price: Low to High</option>
-                            <option value="price-desc">Price: High to Low</option>
-                            <option value="name-asc">Name: A-Z</option>
-                            <option value="name-desc">Name: Z-A</option>
-                        </select>
-                    </div>
                     <h1 className="title">All Products[{sortedProducts.length}]</h1>
-
+                    <div className="sort-container-right" style={{marginBottom: '30px'}}>
+                        <Sorting sortOption={sortOption} onSortChange={handleSortChange} />
+                    </div>
                     {sortedProducts.length.length === 0 && <p>No products found</p>}
 
                     <div className="product-grid">

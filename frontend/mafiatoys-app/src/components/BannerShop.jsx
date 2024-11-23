@@ -1,6 +1,6 @@
 import React from 'react';
 
-const BannerCarousel = ({ storeName , backgroundColor , banner_img1 , banner_img2 , banner_img3 , width_img2 , height_img2 , width_img3 , height_img3 }) => {
+const BannerShop = ({ storeName , backgroundColor , banner_img1 , banner_img2 , banner_img3 , width_img2 , height_img2 , width_img3 , height_img3 }) => {
   return (
     <div>
 
@@ -99,5 +99,5 @@ const BannerCarousel = ({ storeName , backgroundColor , banner_img1 , banner_img
   );
 };
 
-export default BannerCarousel;
+export default BannerShop;
 

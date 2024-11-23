@@ -4,6 +4,8 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import Home from './pages/Home';
 import SearchResults from './pages/SearchResults';
 import ProductDetail from './pages/ProductsDetail';
+import Checkout from './pages/Checkout';
+
 import Stores from './pages/Stores';
 import AllProducts from './pages/AllProducts';
 
@@ -14,7 +16,6 @@ import Arttoys from './pages/Arttoys';
 import Pieceofjoy from './pages/Pieceofjoy';
 import Cart from './pages/Cart';
 import { CartProvider } from './context/CartContext';
-import Checkout from './pages/Checkout';
 
 function App() {
   return (
@@ -25,10 +26,10 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/search" element={<SearchResults />} />
             <Route path="/stores" element={<Stores />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/checkout" element={<Checkout />} />          
+            <Route path="/cart" element={<Cart />} />       
             <Route path="/allproducts" element={<AllProducts />} />
             <Route path="/products/:productId" element={<ProductDetail />} />
+            <Route path="/checkout" element={<Checkout />} /> 
             <Route path="/stores/popmart" element={<Popmart />} />         
             <Route path="/stores/gachabox" element={<Gachabox />} />       
             <Route path="/stores/atongshopp" element={<Atongshopp />} />   

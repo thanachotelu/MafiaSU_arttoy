@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import RangeSlider from 'react-range-slider-input';
 import 'react-range-slider-input/dist/style.css';
 import '../index.css';
+import Sorting from '../components/Sorting';
 
 const Arttoys = () => {
   const [products, setProducts] = useState([]);
@@ -119,8 +120,8 @@ if (error) return <div>{error}</div>;
       <TopMenu />
 
       <BannerShop storeName="Art Toys" backgroundColor="#FFD700" banner_img1="/assets/images/background_arttoys.png"
-                  banner_img2 = "https://scontent.fbkk8-2.fna.fbcdn.net/v/t51.75761-15/465973308_17984281331716691_3026839256678608436_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=127cfc&_nc_ohc=hh8KrduNJYAQ7kNvgFvdY6T&_nc_zt=23&_nc_ht=scontent.fbkk8-2.fna&_nc_gid=ASugIOvdLokWP6XXcrjau-f&oh=00_AYB1a9kwrxDzbDJCJiVzzNJ1oTCFRAgGfyHML_AwfitUjQ&oe=6735345F"
-                  banner_img3 = "https://scontent.fbkk13-3.fna.fbcdn.net/v/t51.75761-15/465811049_17984281358716691_7104167782880976641_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=127cfc&_nc_ohc=abTkkm-Lwh4Q7kNvgH8BMJc&_nc_zt=23&_nc_ht=scontent.fbkk13-3.fna&_nc_gid=ADRp1RRun5T_ZNwxOXYCdzV&oh=00_AYC_ojGgMbtMbjgR0Zs_FKvaxF_yoJ_Z7u2MFaWobL_A8A&oe=673557D8" 
+                  banner_img2 = "/assets/images/promo_arttoys1.png"
+                  banner_img3 = "/assets/images/promo_arttoys2.png" 
                   width_img2 = "50%" height_img2 = "50%" width_img3 = "50%" height_img3 = "50%"
       />
 
@@ -234,19 +235,10 @@ if (error) return <div>{error}</div>;
 
         <div className="product-section">
           <h1 className="title">All Products[{sortedProducts.length}]</h1>
-
           <div className="sort-container-right" style={{marginBottom: '30px'}}>
-            <label>Sort by : </label>
-            <select onChange={handleSortChange} value={sortOption}>
-              <option value="">None</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-              <option value="name-asc">Name: A-Z</option>
-              <option value="name-desc">Name: Z-A</option>
-            </select>
+            <Sorting sortOption={sortOption} onSortChange={handleSortChange} />
           </div>
-
-          <h1 className="title">All Products</h1>
+          {sortedProducts.length.length === 0 && <p>No products found</p>}
           <div className="product-grid">
             {sortedProducts.map(product => {
                 // ตรวจสอบว่า images มีค่าหรือไม่ และเป็น Array หรือไม่

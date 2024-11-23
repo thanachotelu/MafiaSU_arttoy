@@ -4,6 +4,7 @@ import Footer from '../components/Footer'; // ส่วนแสดง Footer
 import BannerShop from '../components/BannerShop';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import Sorting from '../components/Sorting';
 
 import RangeSlider from 'react-range-slider-input';
 import 'react-range-slider-input/dist/style.css';
@@ -119,8 +120,8 @@ if (error) return <div>{error}</div>;
       <TopMenu />
 
       <BannerShop storeName="POPMART" backgroundColor="#f8d7da" banner_img1="/assets/images/banner_popmart.png"
-                banner_img2="https://down-bs-th.img.susercontent.com/cn-11134210-7ras8-m2ay1opz34ou06.webp"
-                banner_img3="https://down-bs-th.img.susercontent.com/cn-11134210-7ras8-m2buxez9p01q79.webp"
+                banner_img2="/assets/images/promo_popmart1.png"
+                banner_img3="/assets/images/promo_popmart2.png"
                 width_img2="50%" height_img2="auto" width_img3="50%" height_img3="auto"
       />
 
@@ -209,18 +210,10 @@ if (error) return <div>{error}</div>;
         </div>
 
         <div className="product-section">
-          <div className="sort-container-right">
-            <label>Sort by: </label>
-            <select onChange={handleSortChange} value={sortOption}>
-              <option value="">None</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-              <option value="name-asc">Name: A-Z</option>
-              <option value="name-desc">Name: Z-A</option>
-            </select>
-          </div>
-
           <h1 className="title">All Products[{sortedProducts.length}]</h1>
+          <div className="sort-container-right" style={{marginBottom: '30px'}}>
+            <Sorting sortOption={sortOption} onSortChange={handleSortChange} />
+          </div>
           {sortedProducts.length.length === 0 && <p>No products found</p>}
           <div className="product-grid">
             {sortedProducts.map(product => {

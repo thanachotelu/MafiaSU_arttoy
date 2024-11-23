@@ -4,33 +4,18 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import TopMenu from '../components/TopMenu';
 import Footer from '../components/Footer';
+import Sorting from '../components/Sorting';
 
 const placeholderImage = '../assets/images/placeholder.jpg';
 
 const SearchResults = () => {
   const [products, setProducts] = useState([]);
-  const [sortedProducts, setSortedProducts] = useState([]);
   const [searchParams] = useSearchParams();
-
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(null); // ใช้สำหรับเก็บข้อผิดพลาด
   const [sortOption, setSortOption] = useState('');
   const [sortedProducts, setSortedProducts] = useState([]);
 
   const searchQuery = searchParams.get('q');
-
-  const handleSortChange = (e) => {
-    setSortOption(e.target.value);
-};
-
-const sortProducts = (products, option) => {
-  let sorted = [...products];
-  if (option === 'price-asc') {
-    sorted.sort((a, b) => a.price - b.price); // เรียงจากราคาต่ำไปสูง
-  } else if (option === 'price-desc') {
-    sorted.sort((a, b) => b.price - a.price); // เรียงจากราคาสูงไปต่ำ
-  }
-  return sorted;
-};
 
   // ฟังก์ชันดึงข้อมูลสินค้าจาก API
   const fetchProducts = (query) => {
@@ -68,7 +53,6 @@ const sortProducts = (products, option) => {
     setSortedProducts(sortProducts(products, sortOption));
   }, [sortOption, products]);
 
-
   const sortProducts = (products, option) => {
     let sorted = [...products];
     if (option === 'price-asc') {
@@ -86,15 +70,10 @@ const sortProducts = (products, option) => {
       <Container className="my-5">
       <div className="sort-container-right">
         <h2 className="text-center mb-4">ผลการค้นหาสำหรับ "{searchQuery}"</h2>
-
-            <label>Sort by : </label>
-            <select onChange={handleSortChange} value={sortOption} style={{marginBottom: '30px'}}>
-                <option value="">None</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-            </select>
+          <div className="sort-container-center" style={{ marginBottom: '30px' }}>
+            <Sorting sortOption={sortOption} onSortChange={handleSortChange} />
+          </div>
         </div>   
-
 
         <Row>
           {error ? (
@@ -133,7 +112,7 @@ const sortProducts = (products, option) => {
                       <Col md={3} className="d-flex align-items-center justify-content-center">
                         <div>
                           <Link to={`/products/${product.product_id}`}>
-                            <Button variant="danger" className="me-2">
+                            <Button variant="outline-secondary">
                               ดูรายละเอียด
                             </Button>
                           </Link>
