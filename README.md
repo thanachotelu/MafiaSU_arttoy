@@ -24,3 +24,7 @@ $ npm install
 
 # run server
 $ npm start
+```
+
+### อย่าลืมเข้าไปสร้าง database server ใน pgadmin
+### ต้องเปลี่ยน port ในไฟล์ **env** ด้วย
