@@ -113,7 +113,9 @@ const sortedProducts = filteredProducts.sort((a, b) => {
     }
     return 0;
 });
+
 if (loading) return <div>Loading...</div>;
+
 if (error) return <div>{error}</div>;
   return (
     <div>
